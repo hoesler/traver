@@ -3,6 +3,8 @@
 namespace Traver\Enumerable;
 
 
+use Iterator;
+use PhpOption\Option;
 use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
 
@@ -10,7 +12,7 @@ interface Enumerable extends \IteratorAggregate, \Countable
 {
     /**
      * Creates a new traversable collection by applying a function to all elements of this traversable collection.
-     * @param callable $mappingFunction the function to apply to each element.
+     * @param callable $mappingFunction the function to apply to each element. Arguments are: value, key.
      * @return Enumerable A new traversable collection resulting from applying the given mappingFunction to each element
      * of this traversable collection and collecting the results.
      */
@@ -34,7 +36,7 @@ interface Enumerable extends \IteratorAggregate, \Countable
     /**
      * Aggregates the results of applying an operator to subsequent elements.
      * @param callable $binaryFunction called with 3 arguments during iteration: next value, current aggregate, key of value.
-     * @param $initialValue
+     * @param mixed $initialValue
      * @return mixed
      */
     public function aggregate(callable $binaryFunction, $initialValue = null);
@@ -48,7 +50,7 @@ interface Enumerable extends \IteratorAggregate, \Countable
 
     /**
      * Selects all elements except first n ones.
-     * @param $n
+     * @param int $n
      * @return Enumerable
      */
     public function drop($n);
@@ -82,8 +84,44 @@ interface Enumerable extends \IteratorAggregate, \Countable
     public function filterNot(callable $predicate);
 
     /**
+     * @param callable $predicate
+     * @return Option
+     */
+    public function find(callable $predicate);
+
+    /**
+     * Selects an interval of elements.
+     * @param int $from
+     * @param int $until
+     * @return Enumerable
+     */
+    public function slice($from, $until);
+
+    /**
+     * @param callable $f
+     */
+    public function each(callable $f);
+
+    /**
+     * Maps the values to their keys.
+     * @return Enumerable
+     */
+    public function keys();
+
+    /**
+     * @return bool
+     */
+    public function isEmpty();
+
+    /**
      * Transforms this Enumerable to an array.
+     * @param bool $preserveKeys
      * @return array
      */
-    public function toArray();
+    public function toArray($preserveKeys = true);
+
+    /**
+     * @return Iterator
+     */
+    public function getIterator();
 }

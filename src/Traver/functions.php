@@ -2,29 +2,25 @@
 
 namespace Traver;
 
-use ArrayIterator;
-use Iterator;
+use ArrayObject;
 use IteratorAggregate;
 use Traver\Enumerable\Enumerable;
-use Traver\Enumerable\IteratingEnumerable;
+use Traver\Enumerable\EnumerableView;
 use Traversable;
 
-if (!function_exists('Traver\traver')) {
+if (!function_exists('Traver\view')) {
     /**
      * @param array|Traversable $collection
      * @return Enumerable
      */
-    function traver($collection)
+    function view($collection)
     {
         if (is_array($collection)) {
-            return new IteratingEnumerable(new ArrayIterator($collection));
-        } elseif ($collection instanceof Iterator) {
-            return new IteratingEnumerable($collection);
+            return new EnumerableView(new ArrayObject($collection));
         } elseif ($collection instanceof IteratorAggregate) {
-            return new IteratingEnumerable($collection->getIterator());
+            return new EnumerableView($collection);
         } else {
-            // TODO: do we ever get here?
-            return new IteratingEnumerable(new ArrayIterator(iterator_to_array($collection)));
+            return new EnumerableView(new ArrayObject(iterator_to_array($collection)));
         }
     }
 }
@@ -36,7 +32,7 @@ if (!function_exists('Traver\head')) {
      */
     function head($collection)
     {
-        return traver($collection)->head();
+        return view($collection)->head();
     }
 }
 
@@ -47,7 +43,7 @@ if (!function_exists('Traver\tail')) {
      */
     function tail($collection)
     {
-        return traver($collection)->tail()->toArray();
+        return view($collection)->tail()->toArray();
     }
 }
 
@@ -59,6 +55,6 @@ if (!function_exists('Traver\map')) {
      */
     function map($collection, callable $mappingFunction)
     {
-        return traver($collection)->map($mappingFunction)->toArray();
+        return view($collection)->map($mappingFunction)->toArray();
     }
 }

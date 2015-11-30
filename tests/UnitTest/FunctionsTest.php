@@ -1,11 +1,42 @@
 <?php
 
-namespace UnitTest;
+namespace Traver\Test\UnitTest;
 
 use PHPUnit_Framework_TestCase;
+use Traver\Enumerable\Enumerable;
 
 class FunctionsTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers ::\Traver\view
+     */
+    public function testViewArray()
+    {
+        // given
+        $array = ["a", "b", "c"];
+
+        // when
+        $view = \Traver\view($array);
+
+        // then
+        self::assertInstanceOf(Enumerable::class, $view);
+    }
+
+    /**
+     * @covers ::\Traver\view
+     */
+    public function testViewArrayObject()
+    {
+        // given
+        $arrayObject = new \ArrayObject(["a", "b", "c"]);
+
+        // when
+        $view = \Traver\view($arrayObject);
+
+        // then
+        self::assertInstanceOf(Enumerable::class, $view);
+    }
+
     /**
      * @covers ::\Traver\head
      */

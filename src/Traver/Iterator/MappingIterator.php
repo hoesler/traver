@@ -20,6 +20,7 @@ class MappingIterator implements OuterIterator
     /**
      * MappingIterator constructor.
      * @param Iterator $delegate
+     * @param callable $mappingFunction
      */
     public function __construct(Iterator $delegate, callable $mappingFunction)
     {
