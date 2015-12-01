@@ -34,14 +34,6 @@ interface Enumerable extends \Traversable, \Countable
     public function tail();
 
     /**
-     * Aggregates the results of applying an operator to subsequent elements.
-     * @param callable $binaryFunction called with 3 arguments during iteration: next value, current aggregate, key of value.
-     * @param mixed $initialValue
-     * @return mixed
-     */
-    public function aggregate(callable $binaryFunction, $initialValue = null);
-
-    /**
      * Counts the number of elements in the traversable or iterator which satisfy a predicate.
      * @param callable $predicate
      * @return int
@@ -96,6 +88,38 @@ interface Enumerable extends \Traversable, \Countable
      * @return Enumerable
      */
     public function flatMap(callable $mappingFunction);
+
+    /**
+     * Applies a binary operator to a start value and all elements of this traversable or iterator, going left to right.
+     * @param mixed $initialValue
+     * @param callable $binaryFunction
+     * @return mixed
+     */
+    public function foldLeft($initialValue, callable $binaryFunction);
+
+    /**
+     * Applies a binary operator to a start value and all elements of this traversable or iterator, going right to left.
+     * @param mixed $initialValue
+     * @param callable $binaryFunction
+     * @return mixed
+     */
+    public function foldRight($initialValue, callable $binaryFunction);
+
+    /**
+     * Tests whether a predicate holds for all elements of this traversable collection.
+     * @param callable $predicate
+     * @return bool
+     */
+    public function forall(callable $predicate);
+
+    /**
+     * Partitions this traversable collection into a map of traversable collections according to some discriminator function.
+     * <p>Note: this method is not re-implemented by views.
+     * This means when applied to a view it will always force the view and return a new traversable collection.</p>
+     * @param callable $keyFunction
+     * @return Map
+     */
+    public function groupBy(callable $keyFunction);
 
     /**
      * Selects an interval of elements.

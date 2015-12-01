@@ -102,6 +102,20 @@ trait EnumerableViewLike
     }
 
     /**
+     * Partitions this traversable collection into a map of traversable collections according to some discriminator function.
+     * <p>Note: this method is not re-implemented by views.
+     * This means when applied to a view it will always force the view and return a new traversable collection.</p>
+     * @param callable $keyFunction
+     * @return Map
+     * @see Enumerable::groupBy
+     */
+    public function groupBy(callable $keyFunction)
+    {
+        $arrayObjectEnumerable = new ArrayObjectEnumerable($this->toArray());
+        return $arrayObjectEnumerable->groupBy($keyFunction);
+    }
+
+    /**
      * @return Iterator
      */
     abstract function getIterator();
@@ -307,12 +321,12 @@ class FlatMapped implements \IteratorAggregate, Enumerable
             new MappingIterator(
                 new MappingIterator($this->delegate->getIterator(), $this->mappingFunction),
                 function ($element) {
-                    if ($element instanceof \Iterator) {
-                        return $element;
+                    if ($element instanceof \Traversable) {
+                        return new \IteratorIterator($element);
                     } elseif (is_array($element)) {
                         return new \ArrayIterator($element);
                     } else {
-                        throw new \RuntimeException("Element must be mapped to an array or an iterator");
+                        return new \ArrayIterator([$element]); // TODO Implement a singleton iterator
                     }
                 })
         );

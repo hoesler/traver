@@ -4,7 +4,7 @@
 namespace Traver\Enumerable;
 
 
-class ArrayObjectEnumerable extends \ArrayObject implements Enumerable
+class ArrayObjectEnumerable extends \ArrayObject implements Map
 {
     use EnumerableLike;
 

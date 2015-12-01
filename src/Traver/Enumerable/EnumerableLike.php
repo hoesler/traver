@@ -20,7 +20,7 @@ trait EnumerableLike
     {
         $builder = $this->builder();
         foreach ($this->asTraversable() as $key => $element) {
-            $builder->add($key, $mappingFunction($element));
+            $builder->add($mappingFunction($element), $key);
         }
         return $builder->build();
     }
@@ -77,18 +77,6 @@ trait EnumerableLike
     /**
      * @inheritDoc
      */
-    public function aggregate(callable $binaryFunction, $initialValue = null)
-    {
-        $result = $initialValue;
-        foreach ($this->asTraversable() as $key => $value) {
-            $result = $binaryFunction($result, $value, $key);
-        }
-        return $result;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function count()
     {
         return iterator_count($this->asTraversable());
@@ -122,7 +110,7 @@ trait EnumerableLike
             $i = 0;
             foreach ($this->asTraversable() as $key => $element) {
                 if ($i >= $from) {
-                    $builder->add($key, $element);
+                    $builder->add($element, $key);
                 }
                 $i++;
                 if ($i >= $until) {
@@ -145,7 +133,7 @@ trait EnumerableLike
                 $go = true;
             }
             if ($go) {
-                $builder->add($key, $element);
+                $builder->add($element, $key);
             }
         }
         return $builder->build();
@@ -172,7 +160,7 @@ trait EnumerableLike
         $builder = $this->builder();
         foreach ($this->asTraversable() as $key => $element) {
             if ($predicate($element, $key)) {
-                $builder->add($key, $element);
+                $builder->add($element, $key);
             }
         }
         return $builder->build();
@@ -213,9 +201,86 @@ trait EnumerableLike
         $builder = $this->builder();
         foreach ($this->asTraversable() as $key => $element) {
             $array = $mappingFunction($element, $key);
-            $builder->addAll($array, false);
+            if (is_array($array) || $array instanceof Traversable) {
+                $builder->addAll($array, false);
+            } else {
+                $builder->add($array);
+            }
         }
         return $builder->build();
+    }
+
+    /**
+     * Applies a binary operator to a start value and all elements of this traversable or iterator, going left to right.
+     * @param mixed $initialValue
+     * @param callable $binaryFunction
+     * @return mixed
+     * @see Enumerable::foldLeft
+     */
+    public function foldLeft($initialValue, callable $binaryFunction)
+    {
+        $result = $initialValue;
+        foreach ($this->asTraversable() as $key => $value) {
+            $result = $binaryFunction($result, $value, $key);
+        }
+        return $result;
+    }
+
+    /**
+     * Applies a binary operator to a start value and all elements of this traversable or iterator, going right to left.
+     * @param mixed $initialValue
+     * @param callable $binaryFunction
+     * @return mixed
+     * @see Enumerable::foldRight
+     */
+    public function foldRight($initialValue, callable $binaryFunction)
+    {
+        $this->reversed()->foldLeft($initialValue, $binaryFunction);
+    }
+
+    protected function reversed()
+    {
+        return $this->builder()->addAll(array_reverse($this->toArray()))->build();
+    }
+
+    /**
+     * Tests whether a predicate holds for all elements of this traversable collection.
+     * @param callable $predicate
+     * @return bool
+     * @see Enumerable::forall
+     */
+    public function forall(callable $predicate)
+    {
+        foreach ($this->asTraversable() as $key => $value) {
+            if (!$predicate($value, $key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param callable $keyFunction
+     * @return Enumerable
+     * @see Enumerable::groupBy
+     */
+    public function groupBy(callable $keyFunction)
+    {
+        $result = [];
+        foreach ($this->asTraversable() as $key => $value) {
+            $groupKey = $keyFunction($value, $key);
+            if (!isset($result[$groupKey])) {
+                $result[$groupKey] = [];
+            }
+            $result[$groupKey][$key] = $value;
+        }
+
+        $map = new ArrayObjectEnumerable();
+        foreach ($result as $key => $group) {
+            $groupEnumerable = $this->builder()->addAll($group)->build();
+            $map[$key] = $groupEnumerable;
+        }
+        return $map;
     }
 
     /**

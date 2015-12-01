@@ -9,16 +9,16 @@ use Traversable;
 interface Builder
 {
     /**
-     * @param mixed $key
      * @param mixed $element
+     * @param mixed $key
      * @return Builder
      */
-    public function add($key, $element);
+    public function add($element, $key = null);
 
     /**
      * @param array|Traversable $array
      * @param bool $preserveKeys
-     * @return mixed
+     * @return Builder
      */
     public function addAll($array, $preserveKeys = true);
 

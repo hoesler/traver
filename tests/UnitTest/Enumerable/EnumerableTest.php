@@ -246,48 +246,6 @@ trait EnumerableTest
     }
 
     /**
-     * @covers ::aggregate
-     */
-    public function testAggregateStrings()
-    {
-        // given
-        $array = ["a", "b", "foo" => "c"];
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-        $concat = function ($a, $b) {
-            return $a . $b;
-        };
-
-        // when
-        $aggregate = $enumerable->aggregate($concat, "");
-
-        // then
-        PHPUnit_Framework_TestCase::assertEquals("abc", $aggregate);
-    }
-
-    /**
-     * @covers ::aggregate
-     */
-    public function testAggregateInts()
-    {
-        // given
-        $array = [10, 5, 1];
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-        $sum = function ($a, $b) {
-            return $a + $b;
-        };
-
-        // when
-        $aggregate = $enumerable->aggregate($sum, 0);
-
-        // then
-        PHPUnit_Framework_TestCase::assertEquals(16, $aggregate);
-    }
-
-    /**
      * @covers ::count
      */
     public function testCount()
@@ -562,6 +520,162 @@ trait EnumerableTest
                     return $element;
                 },
                 [1, 2, 100, 3, 4, 100]
+            ],
+            [
+                [1, 2, [3, 5], 4],
+                function ($e) {
+                    return $e;
+                },
+                [1, 2, 3, 5, 4]
+            ]
+        ];
+    }
+
+    /**
+     * @covers ::foldLeft
+     * @dataProvider foldLeftProvider
+     * @param array $array
+     * @param $initialValue
+     * @param $binaryFunction
+     * @param $expected
+     */
+    public function testFoldLeft(array $array, $initialValue, $binaryFunction, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $folded = $enumerable->foldLeft($initialValue, $binaryFunction);
+
+        // then
+        PHPUnit_Framework_TestCase::assertEquals($expected, $folded);
+    }
+
+    public function foldLeftProvider()
+    {
+        return [
+            [[10, 5, 1], 0, function ($a, $b) {
+                return $a + $b;
+            }, 16],
+            [["a", "b", "foo" => "c"], "", function ($a, $b) {
+                return $a . $b;
+            }, "abc"]
+        ];
+    }
+
+    /**
+     * @covers ::foldLeft
+     * @dataProvider foldLeftProvider
+     * @param array $array
+     * @param $initialValue
+     * @param $binaryFunction
+     * @param $expected
+     */
+    public function testFoldRight(array $array, $initialValue, $binaryFunction, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $folded = $enumerable->foldLeft($initialValue, $binaryFunction);
+
+        // then
+        PHPUnit_Framework_TestCase::assertEquals($expected, $folded);
+    }
+
+    public function foldRightProvider()
+    {
+        return [
+            [[10, 5, 1], 0, function ($a, $b) {
+                return $a - $b;
+            }, -14],
+            [["a", "b", "foo" => "c"], "", function ($a, $b) {
+                return $a . $b;
+            }, "cba"]
+        ];
+    }
+
+    /**
+     * @covers ::foldLeft
+     * @dataProvider forallProvider
+     * @param array $array
+     * @param $predicate
+     * @param $expected
+     */
+    public function testForall(array $array, $predicate, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $all = $enumerable->forall($predicate);
+
+        // then
+        PHPUnit_Framework_TestCase::assertEquals($expected, $all);
+    }
+
+    public function forallProvider()
+    {
+        return [
+            [[1, 5, 4], function ($e) {
+                return $e < 10;
+            }, true],
+            [[1, 5, 4], function ($e) {
+                return $e < 5;
+            }, false],
+            [[], function () {
+                return false;
+            }, true]
+        ];
+    }
+
+    /**
+     * @covers ::groupBy
+     * @dataProvider groupByProvider
+     * @param array $array
+     * @param callable $keyFunction
+     * @param array $expected
+     */
+    public function testGroupBy(array $array, $keyFunction, array $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $group = $enumerable->groupBy($keyFunction);
+
+        // then
+        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $group);
+        PHPUnit_Framework_TestCase::assertEquals(array_keys($expected), array_keys(iterator_to_array($group)),
+            "Group keys differ.");
+        $allValuesAreEnumerables = array_reduce(array_values(iterator_to_array($group)), function ($all, $e) {
+            return $all && ($e instanceof Enumerable);
+        }, true);
+        PHPUnit_Framework_TestCase::assertTrue($allValuesAreEnumerables);
+
+        $actualAsArray = array_map(function ($e) {
+            return iterator_to_array($e);
+        }, iterator_to_array($group));
+        PHPUnit_Framework_TestCase::assertEquals($expected, $actualAsArray);
+    }
+
+    public function groupByProvider()
+    {
+        return [
+            [
+                [1, 2, 10, 12],
+                function ($e) {
+                    return $e < 10 ? "<" : ">";
+                },
+                ["<" => [0 => 1, 1 => 2], ">" => [2 => 10, 3 => 12]]
             ]
         ];
     }
