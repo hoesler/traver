@@ -4,7 +4,7 @@
 namespace Traver\Enumerable;
 
 
-class ArrayObjectEnumerable extends \ArrayObject implements Enumerable, BuilderFactory
+class ArrayObjectEnumerable extends \ArrayObject implements Enumerable
 {
     use EnumerableLike;
 
@@ -14,6 +14,14 @@ class ArrayObjectEnumerable extends \ArrayObject implements Enumerable, BuilderF
     public function __construct($input = [])
     {
         parent::__construct($input);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function asTraversable()
+    {
+        return $this;
     }
 
     /**

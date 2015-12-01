@@ -4,11 +4,11 @@
 namespace Traver\Enumerable;
 
 
-use Iterator;
 use PhpOption\None;
 use PhpOption\Option;
 use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
+use Traversable;
 
 trait EnumerableLike
 {
@@ -19,7 +19,7 @@ trait EnumerableLike
     public function map(callable $mappingFunction)
     {
         $builder = $this->builder();
-        foreach ($this->getIterator() as $key => $element) {
+        foreach ($this->asTraversable() as $key => $element) {
             $builder->add($key, $mappingFunction($element));
         }
         return $builder->build();
@@ -34,7 +34,7 @@ trait EnumerableLike
         $result = function () {
             throw new NoSuchElementException();
         };
-        foreach ($this->getIterator() as $element) {
+        foreach ($this->asTraversable() as $element) {
             $result = function () use ($element) {
                 return $element;
             };
@@ -60,7 +60,7 @@ trait EnumerableLike
     public function isEmpty()
     {
         $result = true;
-        foreach ($this->getIterator() as $element) {
+        foreach ($this->asTraversable() as $element) {
             $result = false;
         }
         return $result;
@@ -71,7 +71,7 @@ trait EnumerableLike
      */
     public function toArray($preserveKeys = true)
     {
-        return iterator_to_array($this->getIterator(), $preserveKeys);
+        return iterator_to_array($this->asTraversable(), $preserveKeys);
     }
 
     /**
@@ -80,7 +80,7 @@ trait EnumerableLike
     public function aggregate(callable $binaryFunction, $initialValue = null)
     {
         $result = $initialValue;
-        foreach ($this->getIterator() as $key => $value) {
+        foreach ($this->asTraversable() as $key => $value) {
             $result = $binaryFunction($result, $value, $key);
         }
         return $result;
@@ -91,7 +91,7 @@ trait EnumerableLike
      */
     public function count()
     {
-        return iterator_count($this->getIterator());
+        return iterator_count($this->asTraversable());
     }
 
     /**
@@ -120,7 +120,7 @@ trait EnumerableLike
         $builder = $this->builder();
         if ($until > $from) {
             $i = 0;
-            foreach ($this->getIterator() as $key => $element) {
+            foreach ($this->asTraversable() as $key => $element) {
                 if ($i >= $from) {
                     $builder->add($key, $element);
                 }
@@ -140,7 +140,7 @@ trait EnumerableLike
     {
         $builder = $this->builder();
         $go = false;
-        foreach ($this->getIterator() as $key => $element) {
+        foreach ($this->asTraversable() as $key => $element) {
             if (!$go && !$predicate($element, $key)) {
                 $go = true;
             }
@@ -170,7 +170,7 @@ trait EnumerableLike
     public function filter(callable $predicate)
     {
         $builder = $this->builder();
-        foreach ($this->getIterator() as $key => $element) {
+        foreach ($this->asTraversable() as $key => $element) {
             if ($predicate($element, $key)) {
                 $builder->add($key, $element);
             }
@@ -195,12 +195,27 @@ trait EnumerableLike
     public function find(callable $predicate)
     {
         $result = None::create();
-        foreach ($this->getIterator() as $key => $element) {
+        foreach ($this->asTraversable() as $key => $element) {
             if ($predicate($element, $key)) {
                 $result = Option::fromValue($element);
             }
         }
         return $result;
+    }
+
+    /**
+     * @see Enumerable::flatMap()
+     * @param callable $mappingFunction A function which maps each element of this collection to an array or a Traversable.
+     * @return Enumerable
+     */
+    public function flatMap(callable $mappingFunction)
+    {
+        $builder = $this->builder();
+        foreach ($this->asTraversable() as $key => $element) {
+            $array = $mappingFunction($element, $key);
+            $builder->addAll($array, false);
+        }
+        return $builder->build();
     }
 
     /**
@@ -218,15 +233,15 @@ trait EnumerableLike
      */
     public function each(callable $f)
     {
-        foreach ($this->getIterator() as $key => $element) {
+        foreach ($this->asTraversable() as $key => $element) {
             $f($element, $key);
         }
     }
 
     /**
-     * @return Iterator
+     * @return Traversable
      */
-    abstract public function getIterator();
+    abstract public function asTraversable();
 
     /**
      * @return Builder

@@ -4,6 +4,8 @@
 namespace Traver\Enumerable;
 
 
+use Traversable;
+
 interface Builder
 {
     /**
@@ -13,7 +15,12 @@ interface Builder
      */
     public function add($key, $element);
 
-    public function addAll($array);
+    /**
+     * @param array|Traversable $array
+     * @param bool $preserveKeys
+     * @return mixed
+     */
+    public function addAll($array, $preserveKeys = true);
 
     /**
      * @return Enumerable

@@ -3,12 +3,12 @@
 namespace Traver\Enumerable;
 
 
-use Iterator;
 use PhpOption\Option;
 use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
+use Traversable;
 
-interface Enumerable extends \IteratorAggregate, \Countable
+interface Enumerable extends \Traversable, \Countable
 {
     /**
      * Creates a new traversable collection by applying a function to all elements of this traversable collection.
@@ -90,6 +90,14 @@ interface Enumerable extends \IteratorAggregate, \Countable
     public function find(callable $predicate);
 
     /**
+     * Builds a new collection by applying a function to all elements of this traversable collection
+     * and using the elements of the resulting collections.
+     * @param callable $mappingFunction A function which maps each element of this collection to an array or a Traversable.
+     * @return Enumerable
+     */
+    public function flatMap(callable $mappingFunction);
+
+    /**
      * Selects an interval of elements.
      * @param int $from
      * @param int $until
@@ -121,7 +129,7 @@ interface Enumerable extends \IteratorAggregate, \Countable
     public function toArray($preserveKeys = true);
 
     /**
-     * @return Iterator
+     * @return Traversable
      */
-    public function getIterator();
+    public function asTraversable();
 }

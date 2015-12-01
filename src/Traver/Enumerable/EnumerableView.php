@@ -4,7 +4,7 @@
 namespace Traver\Enumerable;
 
 
-class EnumerableView implements Enumerable
+class EnumerableView implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
 

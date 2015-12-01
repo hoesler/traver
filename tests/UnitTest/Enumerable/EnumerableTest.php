@@ -4,11 +4,11 @@
 namespace Traver\Test\UnitTest\Enumerable;
 
 
-use Iterator;
 use PhpOption\None;
 use PhpOption\Some;
 use PHPUnit_Framework_TestCase;
 use Traver\Enumerable\Enumerable;
+use Traversable;
 
 /**
  * Class EnumerableTest
@@ -18,9 +18,9 @@ use Traver\Enumerable\Enumerable;
 trait EnumerableTest
 {
     /**
-     * @covers ::getIterator
+     * @covers ::asTraversable
      */
-    public function testGetIterator()
+    public function testAsTraversable()
     {
         // given
         $expected = ["a", "b", "c"];
@@ -29,10 +29,10 @@ trait EnumerableTest
         $enumerable = $builder->build();
 
         // when
-        $iterable2 = $enumerable->getIterator();
+        $iterable2 = $enumerable->asTraversable();
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Iterator::class, $iterable2);
+        PHPUnit_Framework_TestCase::assertInstanceOf(Traversable::class, $iterable2);
         PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($iterable2));
     }
 
@@ -522,6 +522,48 @@ trait EnumerableTest
 
         // then
         PHPUnit_Framework_TestCase::assertInstanceOf(None::class, $var);
+    }
+
+    /**
+     * @covers ::flatMap
+     * @dataProvider flatMapProvider
+     * @param array $array
+     * @param callable $mappingFunction
+     * @param array $expected
+     */
+    public function testFlatMap(array $array, callable $mappingFunction, array $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $var = $enumerable->flatMap($mappingFunction);
+
+        // then
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($var));
+    }
+
+    public function flatMapProvider()
+    {
+        return [
+            [
+                [1, 2, 3, 4],
+                function ($element) {
+                    return [$element, -$element];
+                },
+                [1, -1, 2, -2, 3, -3, 4, -4]
+            ],
+            [
+                [[1, 2], [3, 4]],
+                function ($element) {
+                    $element[] = 100;
+                    return $element;
+                },
+                [1, 2, 100, 3, 4, 100]
+            ]
+        ];
     }
 
     /**

@@ -4,6 +4,8 @@
 namespace Traver\Enumerable;
 
 
+use Traversable;
+
 trait FromArrayBuilder
 {
     /**
@@ -22,12 +24,17 @@ trait FromArrayBuilder
     }
 
     /**
-     * @param array $array
+     * @param array|Traversable $array
+     * @param bool $preserveKeys
      */
-    public function addAll($array)
+    public function addAll($array, $preserveKeys = true)
     {
         foreach ($array as $key => $value) {
-            $this->add($key, $value);
+            if ($preserveKeys) {
+                $this->add($key, $value);
+            } else {
+                array_push($this->array, $value);
+            }
         }
     }
 }

@@ -5,9 +5,12 @@ namespace Traver\Enumerable;
 
 
 use CallbackFilterIterator;
+use Iterator;
+use IteratorAggregate;
 use LimitIterator;
 use Traver\Exception\UnsupportedOperationException;
 use Traver\Iterator\CallbackOffsetIterator;
+use Traver\Iterator\ConcatIterator;
 use Traver\Iterator\MappingIterator;
 
 trait EnumerableViewLike
@@ -72,6 +75,15 @@ trait EnumerableViewLike
     /**
      * @inheritDoc
      */
+    public function flatMap(callable $mappingFunction)
+    {
+        return new FlatMapped($this, $mappingFunction);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
     public function keys()
     {
         return new Mapped($this, function ($value, $key) {
@@ -89,13 +101,26 @@ trait EnumerableViewLike
         return new Sliced($this, $from, $until);
     }
 
+    /**
+     * @return Iterator
+     */
+    abstract function getIterator();
+
+    /**
+     * @inheritDoc
+     */
+    public function asTraversable()
+    {
+        return $this->getIterator();
+    }
+
     protected function builder()
     {
         throw new UnsupportedOperationException("EnumerableView does not support builder");
     }
 }
 
-class Filtered implements Enumerable
+class Filtered implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
 
@@ -124,7 +149,7 @@ class Filtered implements Enumerable
     }
 }
 
-class DroppedWhile implements Enumerable
+class DroppedWhile implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
 
@@ -153,7 +178,7 @@ class DroppedWhile implements Enumerable
     }
 }
 
-class Dropped implements Enumerable
+class Dropped implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
 
@@ -182,7 +207,7 @@ class Dropped implements Enumerable
     }
 }
 
-class Sliced implements Enumerable
+class Sliced implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
 
@@ -224,7 +249,7 @@ class Sliced implements Enumerable
     }
 }
 
-class Mapped implements Enumerable
+class Mapped implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
 
@@ -250,5 +275,46 @@ class Mapped implements Enumerable
     public function getIterator()
     {
         return new MappingIterator($this->delegate->getIterator(), $this->mappingFunction);
+    }
+}
+
+class FlatMapped implements \IteratorAggregate, Enumerable
+{
+    use EnumerableViewLike;
+
+    /**
+     * @var callable
+     */
+    private $mappingFunction;
+
+    /**
+     * MapView constructor.
+     * @param EnumerableViewLike $delegate
+     * @param callable $mappingFunction
+     */
+    public function __construct($delegate, $mappingFunction)
+    {
+        $this->mappingFunction = $mappingFunction;
+        $this->delegate = $delegate;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIterator()
+    {
+        return new ConcatIterator(
+            new MappingIterator(
+                new MappingIterator($this->delegate->getIterator(), $this->mappingFunction),
+                function ($element) {
+                    if ($element instanceof \Iterator) {
+                        return $element;
+                    } elseif (is_array($element)) {
+                        return new \ArrayIterator($element);
+                    } else {
+                        throw new \RuntimeException("Element must be mapped to an array or an iterator");
+                    }
+                })
+        );
     }
 }
