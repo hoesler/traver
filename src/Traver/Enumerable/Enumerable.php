@@ -13,10 +13,11 @@ interface Enumerable extends \Traversable, \Countable
     /**
      * Creates a new Enumerable by applying a function to all elements of {@link asTraversable()}.
      * @param callable $mappingFunction the function to apply to each element. Arguments are: value, key.
+     * @param bool $preserveKeys
      * @return Enumerable A new traversable collection resulting from applying the given mappingFunction to each element
      * of this traversable collection and collecting the results.
      */
-    public function map(callable $mappingFunction);
+    public function map(callable $mappingFunction, $preserveKeys = true);
 
     /**
      * Selects the first element of this collection.

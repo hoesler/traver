@@ -16,16 +16,26 @@ class MappingIterator implements OuterIterator
      * @var callable
      */
     private $mappingFunction;
+    /**
+     * @var bool
+     */
+    private $preserveKeys;
+    /**
+     * @var
+     */
+    private $index;
 
     /**
      * MappingIterator constructor.
      * @param Iterator $delegate
      * @param callable $mappingFunction
+     * @param bool $preserveKeys
      */
-    public function __construct(Iterator $delegate, callable $mappingFunction)
+    public function __construct(Iterator $delegate, callable $mappingFunction, $preserveKeys = true)
     {
         $this->delegate = $delegate;
         $this->mappingFunction = $mappingFunction;
+        $this->preserveKeys = $preserveKeys;
     }
 
     /**
@@ -42,6 +52,7 @@ class MappingIterator implements OuterIterator
     public function next()
     {
         $this->delegate->next();
+        $this->index++;
     }
 
     /**
@@ -49,7 +60,7 @@ class MappingIterator implements OuterIterator
      */
     public function key()
     {
-        return $this->delegate->key();
+        return ($this->preserveKeys) ? $this->delegate->key() : $this->index;
     }
 
     /**
@@ -66,6 +77,7 @@ class MappingIterator implements OuterIterator
     public function rewind()
     {
         $this->delegate->rewind();
+        $this->index = 0;
     }
 
     /**

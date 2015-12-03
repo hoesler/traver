@@ -21,13 +21,16 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::map}.
      * @param callable $mappingFunction
+     * @param bool $preserveKeys
      * @return Enumerable
      */
-    public function map(callable $mappingFunction)
+    public function map(callable $mappingFunction, $preserveKeys = true)
     {
         $builder = $this->builder();
+        $index = 0;
         foreach ($this->asTraversable() as $key => $element) {
-            $builder->add($mappingFunction($element), $key);
+            $builder->add($mappingFunction($element, $key), ($preserveKeys) ? $key : $index);
+            $index++;
         }
         return $builder->build();
     }
@@ -384,7 +387,7 @@ trait EnumerableLike
         /** @noinspection PhpUnusedParameterInspection */
         return $this->map(function ($value, $key) {
             return $key;
-        });
+        }, false);
     }
 
     /**
@@ -399,11 +402,13 @@ trait EnumerableLike
     }
 
     /**
+     * Implements {@link Enumerable::asTraversable}.
      * @return Traversable
      */
     abstract public function asTraversable();
 
     /**
+     * Creates a new Builder for the current class implementing Enumerable.
      * @return Builder
      */
     abstract protected function builder();

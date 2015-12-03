@@ -23,9 +23,9 @@ trait EnumerableViewLike
      */
     private $delegate;
 
-    public function map(callable $mappingFunction)
+    public function map(callable $mappingFunction, $preserveKeys = true)
     {
-        return new Mapped($this, $mappingFunction);
+        return new Mapped($this, $mappingFunction, $preserveKeys);
     }
 
     public function tail()
@@ -78,7 +78,7 @@ trait EnumerableViewLike
         /** @noinspection PhpUnusedParameterInspection */
         return new Mapped($this, function ($value, $key) {
             return $key;
-        });
+        }, false);
     }
 
     public function slice($from, $until)
@@ -233,21 +233,27 @@ class Mapped implements \IteratorAggregate, Enumerable
      * @var callable
      */
     private $mappingFunction;
+    /**
+     * @var int
+     */
+    private $preserveKeys;
 
     /**
      * MapView constructor.
      * @param EnumerableViewLike $delegate
      * @param callable $mappingFunction
+     * @param bool $preserveKeys
      */
-    public function __construct($delegate, $mappingFunction)
+    public function __construct($delegate, $mappingFunction, $preserveKeys = true)
     {
         $this->mappingFunction = $mappingFunction;
         $this->delegate = $delegate;
+        $this->preserveKeys = $preserveKeys;
     }
 
     public function getIterator()
     {
-        return new MappingIterator($this->delegate->getIterator(), $this->mappingFunction);
+        return new MappingIterator($this->delegate->getIterator(), $this->mappingFunction, $this->preserveKeys);
     }
 }
 

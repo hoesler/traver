@@ -176,8 +176,9 @@ trait EnumerableTest
      * @param $input
      * @param $from
      * @param $until
+     * @param $expected
      */
-    public function testSlice($input, $from, $until)
+    public function testSlice($input, $from, $until, $expected)
     {
         // given
         $array = $input;
@@ -189,7 +190,6 @@ trait EnumerableTest
         $slice = $enumerable->slice($from, $until);
 
         // then
-        $expected = array_slice($array, $from, max($until - $from, 0), true);
         $actual = iterator_to_array($slice, true);
         PHPUnit_Framework_TestCase::assertEquals($expected, $actual);
     }
@@ -197,12 +197,13 @@ trait EnumerableTest
     public function sliceProvider()
     {
         return [
-            [["a", "b", "c"], 0, 0],
-            [["a", "b", "c"], 0, 3],
-            [["a", "b", "c"], 0, 1],
-            [["a", "b", "c"], 1, 2],
-            [["a", "b", "c"], 2, 1],
-            [["a", "b", "c"], 2, 23]
+            [["a", "b", "c"], 0, 0, []],
+            [["a", "b", "c"], 0, 3, ["a", "b", "c"]],
+            [["a", "b", "c"], 0, 1, ["a"]],
+            [["a", "b", "c"], 1, 2, [1 => "b"]],
+            [["a", "b", "c"], 2, 1, []],
+            [["a", "b", "c"], 2, 23, [2 => "c"]],
+            [[], 0, 0, []]
         ];
     }
 
@@ -356,7 +357,7 @@ trait EnumerableTest
     }
 
     /**
-     * @covers ::dropWhile
+     * @covers ::takeWhile
      * @dataProvider takeWhileProvider
      * @param $array
      * @param $predicate
@@ -435,9 +436,9 @@ trait EnumerableTest
     }
 
     /**
-     * @covers ::filter
+     * @covers ::select
      */
-    public function testFilter()
+    public function testSelect()
     {
         // given
         $array = ["a", "b", "c"];
@@ -890,7 +891,7 @@ trait EnumerableTest
     }
 
     /**
-     * @covers ::groupBy
+     * @covers ::join
      * @dataProvider joinProvider
      * @param array $array
      * @param $separator
@@ -933,6 +934,36 @@ trait EnumerableTest
                 ",",
                 "1,2,10,12"
             ]
+        ];
+    }
+
+    /**
+     * @covers ::keys
+     * @dataProvider keysProvider
+     * @param $array
+     * @param $expected
+     */
+    public function testKeys($array, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $keys = $enumerable->keys();
+
+        // then
+        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $keys);
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($keys));
+    }
+
+    public function keysProvider()
+    {
+        return [
+            [["a", "b", "c"], [0, 1, 2]],
+            [["a" => 1, "b" => 2, "c" => 3], ["a", "b", "c"]],
+            [[], []]
         ];
     }
 

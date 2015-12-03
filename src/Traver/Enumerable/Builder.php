@@ -6,6 +6,10 @@ namespace Traver\Enumerable;
 
 use Traversable;
 
+/**
+ * Interface Builder
+ * @package Traver\Enumerable
+ */
 interface Builder
 {
     /**
