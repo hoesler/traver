@@ -6,13 +6,20 @@ namespace Traver\Enumerable;
 
 use PhpOption\None;
 use PhpOption\Option;
+use PhpOption\Some;
 use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
 use Traversable;
 
+/**
+ * Class EnumerableLike
+ * @package Traver\Enumerable
+ * @implements Enumerable
+ */
 trait EnumerableLike
 {
     /**
+     * Implements {@link Enumerable::map}.
      * @param callable $mappingFunction
      * @return Enumerable
      */
@@ -26,7 +33,7 @@ trait EnumerableLike
     }
 
     /**
-     * @see Enumerable::head()
+     * Implements {@link Enumerable::head}.
      * @return mixed
      */
     public function head()
@@ -44,7 +51,7 @@ trait EnumerableLike
     }
 
     /**
-     * @see Enumerable::head()
+     * Implements {@link Enumerable::tail}.
      */
     public function tail()
     {
@@ -55,11 +62,12 @@ trait EnumerableLike
     }
 
     /**
-     * @see Enumerable::isEmpty()
+     * Implements {@link Enumerable::isEmpty}.
      */
     public function isEmpty()
     {
         $result = true;
+        /** @noinspection PhpUnusedLocalVariableInspection */
         foreach ($this->asTraversable() as $element) {
             $result = false;
         }
@@ -67,7 +75,9 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::toArray}.
+     * @param bool $preserveKeys
+     * @return array
      */
     public function toArray($preserveKeys = true)
     {
@@ -75,7 +85,7 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::count}.
      */
     public function count()
     {
@@ -83,7 +93,9 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::countWhich}.
+     * @param callable $predicate
+     * @return int
      */
     public function countWhich(callable $predicate)
     {
@@ -91,7 +103,9 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::drop}.
+     * @param $n
+     * @return Enumerable
      */
     public function drop($n)
     {
@@ -99,6 +113,7 @@ trait EnumerableLike
     }
 
     /**
+     * Implements {@link Enumerable::slice}.
      * @param int $from
      * @param int $until
      * @return Enumerable
@@ -122,7 +137,9 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::dropWhile}.
+     * @param callable $predicate
+     * @return Enumerable
      */
     public function dropWhile(callable $predicate)
     {
@@ -140,7 +157,9 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::exists}.
+     * @param callable $predicate
+     * @return bool
      */
     public function exists(callable $predicate)
     {
@@ -153,7 +172,9 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::filter}.
+     * @param callable $predicate
+     * @return Enumerable
      */
     public function filter(callable $predicate)
     {
@@ -167,9 +188,11 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Implements {@link Enumerable::reject}.
+     * @param callable $predicate
+     * @return Enumerable
      */
-    public function filterNot(callable $predicate)
+    public function reject(callable $predicate)
     {
         return $this->filter(function ($element, $key) use ($predicate) {
             return !$predicate($element, $key);
@@ -177,8 +200,9 @@ trait EnumerableLike
     }
 
     /**
+     * Implements {@link Enumerable::find}.
      * @param callable $predicate
-     * @return mixed
+     * @return Option
      */
     public function find(callable $predicate)
     {
@@ -192,8 +216,8 @@ trait EnumerableLike
     }
 
     /**
-     * @see Enumerable::flatMap()
-     * @param callable $mappingFunction A function which maps each element of this collection to an array or a Traversable.
+     * Implements {@link Enumerable::flatMap}.
+     * @param callable $mappingFunction
      * @return Enumerable
      */
     public function flatMap(callable $mappingFunction)
@@ -211,45 +235,11 @@ trait EnumerableLike
     }
 
     /**
-     * Applies a binary operator to a start value and all elements of this traversable or iterator, going left to right.
-     * @param mixed $initialValue
-     * @param callable $binaryFunction
-     * @return mixed
-     * @see Enumerable::foldLeft
-     */
-    public function foldLeft($initialValue, callable $binaryFunction)
-    {
-        $result = $initialValue;
-        foreach ($this->asTraversable() as $key => $value) {
-            $result = $binaryFunction($result, $value, $key);
-        }
-        return $result;
-    }
-
-    /**
-     * Applies a binary operator to a start value and all elements of this traversable or iterator, going right to left.
-     * @param mixed $initialValue
-     * @param callable $binaryFunction
-     * @return mixed
-     * @see Enumerable::foldRight
-     */
-    public function foldRight($initialValue, callable $binaryFunction)
-    {
-        $this->reversed()->foldLeft($initialValue, $binaryFunction);
-    }
-
-    protected function reversed()
-    {
-        return $this->builder()->addAll(array_reverse($this->toArray()))->build();
-    }
-
-    /**
-     * Tests whether a predicate holds for all elements of this traversable collection.
+     * Implements {@link Enumerable::all}.
      * @param callable $predicate
      * @return bool
-     * @see Enumerable::forall
      */
-    public function forall(callable $predicate)
+    public function all(callable $predicate)
     {
         foreach ($this->asTraversable() as $key => $value) {
             if (!$predicate($value, $key)) {
@@ -257,6 +247,21 @@ trait EnumerableLike
             }
         }
         return true;
+    }
+
+    /**
+     * Implements {@link Enumerable::any}.
+     * @param callable $predicate
+     * @return bool
+     */
+    public function any(callable $predicate)
+    {
+        foreach ($this->asTraversable() as $key => $value) {
+            if ($predicate($value, $key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -284,16 +289,79 @@ trait EnumerableLike
     }
 
     /**
-     * @inheritDoc
+     * Concatenates the strval of all elements separated by the given separator.
+     * @param $separator
+     * @return mixed
+     * @see Enumerable::join
+     */
+    public function join($separator = '')
+    {
+        return $this->reduceOption(function ($joined, $item) use ($separator) {
+            return $joined . $separator . $item;
+        })->getOrElse('');
+    }
+
+    /**
+     * Implements {@link Enumerable::reduce}.
+     * @param callable $binaryFunction
+     * @param mixed $initial
+     * @return mixed
+     * @throws NoSuchElementException
+     */
+    public function reduce(callable $binaryFunction, $initial = null)
+    {
+        $isInitialArgumentAbsent = (func_num_args() == 1);
+
+        if ($this->isEmpty() && $isInitialArgumentAbsent) {
+            throw new UnsupportedOperationException("empty.reduce");
+        }
+
+        $result = $initial;
+        $first = $isInitialArgumentAbsent;
+        foreach ($this->asTraversable() as $key => $item) {
+            if ($first) {
+                $result = $item;
+                $first = false;
+            } else {
+                $result = $binaryFunction($result, $item, $key);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Implements {@link Enumerable::reduceOption}.
+     * @param callable $binaryFunction
+     * @param mixed $initial
+     * @return Option
+     */
+    public function reduceOption(callable $binaryFunction, $initial = null)
+    {
+        if (func_num_args() == 1) {
+            if ($this->isEmpty()) {
+                return None::create();
+            } else {
+                return Some::create($this->reduce($binaryFunction));
+            }
+        } else {
+            return Some::create($this->reduce($binaryFunction, $initial));
+        }
+    }
+
+    /**
+     * Implements {@link Enumerable::keys}.
+     * @return Enumerable
      */
     public function keys()
     {
+        /** @noinspection PhpUnusedParameterInspection */
         return $this->map(function ($value, $key) {
             return $key;
         });
     }
 
     /**
+     * Implements {@link Enumerable::each}.
      * @param callable $f
      */
     public function each(callable $f)

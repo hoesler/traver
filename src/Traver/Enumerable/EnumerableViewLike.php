@@ -27,9 +27,6 @@ trait EnumerableViewLike
         return new Mapped($this, $mappingFunction);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function tail()
     {
         if ($this->isEmpty()) {
@@ -38,77 +35,46 @@ trait EnumerableViewLike
         return new Sliced($this, 1);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function drop($n)
     {
         return new Dropped($this, $n);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function dropWhile(callable $predicate)
     {
         return new DroppedWhile($this, $predicate);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function filter(callable $predicate)
     {
         return new Filtered($this, $predicate);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function filterNot(callable $predicate)
+    public function reject(callable $predicate)
     {
         return new Filtered($this, function ($value, $key) use ($predicate) {
             return !$predicate($value, $key);
         });
     }
 
-    /**
-     * @inheritDoc
-     */
     public function flatMap(callable $mappingFunction)
     {
         return new FlatMapped($this, $mappingFunction);
     }
 
-
-    /**
-     * @inheritDoc
-     */
     public function keys()
     {
+        /** @noinspection PhpUnusedParameterInspection */
         return new Mapped($this, function ($value, $key) {
             return $key;
         });
     }
 
-    /**
-     * @param int $from
-     * @param int $until
-     * @return Enumerable
-     */
     public function slice($from, $until)
     {
         return new Sliced($this, $from, $until);
     }
 
-    /**
-     * Partitions this traversable collection into a map of traversable collections according to some discriminator function.
-     * <p>Note: this method is not re-implemented by views.
-     * This means when applied to a view it will always force the view and return a new traversable collection.</p>
-     * @param callable $keyFunction
-     * @return Map
-     * @see Enumerable::groupBy
-     */
     public function groupBy(callable $keyFunction)
     {
         $arrayObjectEnumerable = new ArrayObjectEnumerable($this->toArray());
@@ -120,9 +86,6 @@ trait EnumerableViewLike
      */
     abstract function getIterator();
 
-    /**
-     * @inheritDoc
-     */
     public function asTraversable()
     {
         return $this->getIterator();
@@ -154,9 +117,6 @@ class Filtered implements \IteratorAggregate, Enumerable
         $this->predicate = $predicate;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getIterator()
     {
         return new CallbackFilterIterator($this->delegate->getIterator(), $this->predicate);
@@ -183,9 +143,6 @@ class DroppedWhile implements \IteratorAggregate, Enumerable
         $this->predicate = $predicate;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getIterator()
     {
         return new CallbackOffsetIterator($this->delegate->getIterator(), $this->predicate);
@@ -212,9 +169,6 @@ class Dropped implements \IteratorAggregate, Enumerable
         $this->n = $n;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getIterator()
     {
         return new LimitIterator($this->delegate->getIterator(), $this->n);
@@ -248,9 +202,6 @@ class Sliced implements \IteratorAggregate, Enumerable
         $this->until = $until;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getIterator()
     {
         $offset = $this->from;
@@ -283,9 +234,6 @@ class Mapped implements \IteratorAggregate, Enumerable
         $this->delegate = $delegate;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getIterator()
     {
         return new MappingIterator($this->delegate->getIterator(), $this->mappingFunction);
@@ -312,9 +260,6 @@ class FlatMapped implements \IteratorAggregate, Enumerable
         $this->delegate = $delegate;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getIterator()
     {
         return new ConcatIterator(
