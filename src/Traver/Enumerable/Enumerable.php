@@ -66,7 +66,7 @@ interface Enumerable extends \Traversable, \Countable
      * @param callable $predicate
      * @return Enumerable
      */
-    public function filter(callable $predicate);
+    public function select(callable $predicate);
 
     /**
      * Selects all elements of the enumerable which do not satisfy a predicate.

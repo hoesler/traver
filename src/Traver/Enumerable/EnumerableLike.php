@@ -99,7 +99,7 @@ trait EnumerableLike
      */
     public function countWhich(callable $predicate)
     {
-        return iterator_count($this->filter($predicate));
+        return iterator_count($this->select($predicate));
     }
 
     /**
@@ -172,11 +172,11 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::filter}.
+     * Implements {@link Enumerable::select}.
      * @param callable $predicate
      * @return Enumerable
      */
-    public function filter(callable $predicate)
+    public function select(callable $predicate)
     {
         $builder = $this->builder();
         foreach ($this->asTraversable() as $key => $element) {
@@ -194,7 +194,7 @@ trait EnumerableLike
      */
     public function reject(callable $predicate)
     {
-        return $this->filter(function ($element, $key) use ($predicate) {
+        return $this->select(function ($element, $key) use ($predicate) {
             return !$predicate($element, $key);
         });
     }

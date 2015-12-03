@@ -45,7 +45,7 @@ trait EnumerableViewLike
         return new DroppedWhile($this, $predicate);
     }
 
-    public function filter(callable $predicate)
+    public function select(callable $predicate)
     {
         return new Filtered($this, $predicate);
     }

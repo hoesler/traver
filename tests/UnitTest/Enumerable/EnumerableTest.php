@@ -381,7 +381,7 @@ trait EnumerableTest
         };
 
         // when
-        $filtered = $enumerable->filter($predicate);
+        $filtered = $enumerable->select($predicate);
 
         // then
         PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $filtered);
@@ -430,7 +430,7 @@ trait EnumerableTest
 
         // when
         $head = $enumerable
-            ->filter($predicate)
+            ->select($predicate)
             ->drop(1)
             ->map($mappingFunction)
             ->head();
