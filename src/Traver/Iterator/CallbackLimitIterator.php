@@ -28,11 +28,12 @@ class CallbackLimitIterator extends CallbackFilterIterator
         $this->stop = false;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function accept()
     {
+        if ($this->stop === true) {
+            return false;
+        }
+
         $accepted = parent::accept();
         if (!$accepted) {
             $this->stop = true;
@@ -40,22 +41,9 @@ class CallbackLimitIterator extends CallbackFilterIterator
         return $accepted;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function valid()
-    {
-        return $this->stop === true || parent::valid();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function rewind()
     {
         parent::rewind();
         $this->stop = false;
     }
-
-
 }

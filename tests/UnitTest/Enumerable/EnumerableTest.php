@@ -325,6 +325,74 @@ trait EnumerableTest
     }
 
     /**
+     * @dataProvider takeProvider
+     * @covers ::take
+     * @param $array
+     * @param $n
+     * @param $expected
+     */
+    public function testTake($array, $n, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $taken = $enumerable->take($n);
+
+        // then
+        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $taken);
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($taken));
+    }
+
+    public function takeProvider()
+    {
+        return [
+            [[10, 5, 1], 2, [10, 5]],
+            [[10, 5, 1], 0, []],
+            [[], 2, []]
+        ];
+    }
+
+    /**
+     * @covers ::dropWhile
+     * @dataProvider takeWhileProvider
+     * @param $array
+     * @param $predicate
+     * @param $expected
+     */
+    public function testTakeWhile($array, $predicate, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $taken = $enumerable->takeWhile($predicate);
+
+        // then
+        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $taken);
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($taken));
+    }
+
+    public function takeWhileProvider()
+    {
+        return [
+            [[10, 5, 1], function ($el) {
+                return $el >= 5;
+            }, [10, 5]],
+            [[10, 5, 1], function ($el) {
+                return $el <= 5;
+            }, []],
+            [[], function ($el) {
+                return true;
+            }, []]
+        ];
+    }
+
+    /**
      * @covers ::exists
      */
     public function testExists()

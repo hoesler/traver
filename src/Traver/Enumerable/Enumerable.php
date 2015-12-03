@@ -22,6 +22,7 @@ interface Enumerable extends \Traversable, \Countable
      * Selects the first element of this collection.
      * @return mixed
      * @throws NoSuchElementException if the traversable collection is empty.
+     * @see tail
      */
     public function head();
 
@@ -30,6 +31,7 @@ interface Enumerable extends \Traversable, \Countable
      * The returned traversable preserves the keys.
      * @return Enumerable
      * @throws UnsupportedOperationException if the traversable collection is empty.
+     * @see head
      */
     public function tail();
 
@@ -44,6 +46,7 @@ interface Enumerable extends \Traversable, \Countable
      * Selects all elements except first n ones.
      * @param int $n
      * @return Enumerable
+     * @see slice
      */
     public function drop($n);
 
@@ -53,6 +56,21 @@ interface Enumerable extends \Traversable, \Countable
      * @return Enumerable
      */
     public function dropWhile(callable $predicate);
+
+    /**
+     * Selects the first n elements.
+     * @param int $n
+     * @return Enumerable
+     * @see slice
+     */
+    public function take($n);
+
+    /**
+     * Selects the longest prefix of elements that satisfy a predicate.
+     * @param callable $predicate
+     * @return Enumerable
+     */
+    public function takeWhile(callable $predicate);
 
     /**
      * Tests whether a predicate holds for some of the elements of the enumerable.
@@ -65,6 +83,7 @@ interface Enumerable extends \Traversable, \Countable
      * Selects all elements of the enumerable which satisfy a predicate.
      * @param callable $predicate
      * @return Enumerable
+     * @see reject
      */
     public function select(callable $predicate);
 
@@ -72,6 +91,7 @@ interface Enumerable extends \Traversable, \Countable
      * Selects all elements of the enumerable which do not satisfy a predicate.
      * @param callable $predicate
      * @return Enumerable
+     * @see select
      */
     public function reject(callable $predicate);
 
@@ -93,6 +113,7 @@ interface Enumerable extends \Traversable, \Countable
      * Tests whether a predicate holds for all elements of the enumerable.
      * @param callable $predicate
      * @return bool
+     * @see any
      */
     public function all(callable $predicate);
 
@@ -100,6 +121,7 @@ interface Enumerable extends \Traversable, \Countable
      * Tests whether a predicate holds for any element of the enumerable.
      * @param callable $predicate
      * @return bool
+     * @see all
      */
     public function any(callable $predicate);
 
@@ -116,6 +138,7 @@ interface Enumerable extends \Traversable, \Countable
      * Concatenates the strval of all elements separated by the given separator.
      * @param $separator
      * @return mixed
+     * @see reduce
      */
     public function join($separator = '');
 
@@ -140,10 +163,12 @@ interface Enumerable extends \Traversable, \Countable
     public function reduceOption(callable $binaryFunction, $initial = null);
     
     /**
-     * Selects an interval of elements.
+     * Selects the elements in the interval [from, until).
      * @param int $from
      * @param int $until
      * @return Enumerable
+     * @see take
+     * @see drop
      */
     public function slice($from, $until);
 

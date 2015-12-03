@@ -157,6 +157,33 @@ trait EnumerableLike
     }
 
     /**
+     * Implements {@link Enumerable::take}.
+     * @param int $n
+     * @return Enumerable
+     */
+    public function take($n)
+    {
+        return $this->slice(0, $n);
+    }
+
+    /**
+     * Implements {@link Enumerable::takeWhile}.
+     * @param callable $predicate
+     * @return Enumerable
+     */
+    public function takeWhile(callable $predicate)
+    {
+        $builder = $this->builder();
+        foreach ($this->asTraversable() as $key => $element) {
+            if (!$predicate($element, $key)) {
+                break;
+            }
+            $builder->add($element, $key);
+        }
+        return $builder->build();
+    }
+
+    /**
      * Implements {@link Enumerable::exists}.
      * @param callable $predicate
      * @return bool

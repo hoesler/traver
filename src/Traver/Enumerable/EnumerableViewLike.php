@@ -9,6 +9,7 @@ use Iterator;
 use IteratorAggregate;
 use LimitIterator;
 use Traver\Exception\UnsupportedOperationException;
+use Traver\Iterator\CallbackLimitIterator;
 use Traver\Iterator\CallbackOffsetIterator;
 use Traver\Iterator\ConcatIterator;
 use Traver\Iterator\MappingIterator;
@@ -37,12 +38,22 @@ trait EnumerableViewLike
 
     public function drop($n)
     {
-        return new Dropped($this, $n);
+        return new Sliced($this, $n);
     }
 
     public function dropWhile(callable $predicate)
     {
         return new DroppedWhile($this, $predicate);
+    }
+
+    public function take($n)
+    {
+        return new Sliced($this, 0, $n);
+    }
+
+    public function takeWhile(callable $predicate)
+    {
+        return new TakenWhile($this, $predicate);
     }
 
     public function select(callable $predicate)
@@ -149,29 +160,29 @@ class DroppedWhile implements \IteratorAggregate, Enumerable
     }
 }
 
-class Dropped implements \IteratorAggregate, Enumerable
+class TakenWhile implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
 
     /**
-     * @var int
+     * @var callable
      */
-    private $n;
+    private $predicate;
 
     /**
      * Dropped constructor.
      * @param EnumerableViewLike $delegate
-     * @param int $n
+     * @param callable $predicate
      */
-    public function __construct($delegate, $n)
+    public function __construct($delegate, $predicate)
     {
         $this->delegate = $delegate;
-        $this->n = $n;
+        $this->predicate = $predicate;
     }
 
     public function getIterator()
     {
-        return new LimitIterator($this->delegate->getIterator(), $this->n);
+        return new CallbackLimitIterator($this->delegate->getIterator(), $this->predicate);
     }
 }
 
