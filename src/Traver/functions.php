@@ -25,6 +25,17 @@ if (!function_exists('Traver\view')) {
     }
 }
 
+if (!function_exists('Traver\in')) {
+    /**
+     * @param array|Traversable $collection
+     * @return Enumerable
+     */
+    function in($collection)
+    {
+        return view($collection);
+    }
+}
+
 if (!function_exists('Traver\head')) {
     /**
      * @param array|Traversable $collection

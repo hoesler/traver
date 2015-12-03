@@ -8,12 +8,14 @@ use Traver\Enumerable\Enumerable;
 class FunctionsTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * @dataProvider viewProvider
      * @covers ::\Traver\view
+     * @param $input
      */
-    public function testViewArray()
+    public function testView($input)
     {
         // given
-        $array = ["a", "b", "c"];
+        $array = $input;
 
         // when
         $view = \Traver\view($array);
@@ -22,19 +24,37 @@ class FunctionsTest extends PHPUnit_Framework_TestCase
         self::assertInstanceOf(Enumerable::class, $view);
     }
 
+    public function viewProvider()
+    {
+        return [
+            [["a", "b", "c"]],
+            [new \ArrayObject(["a", "b", "c"])]
+        ];
+    }
+
     /**
+     * @dataProvider inProvider
      * @covers ::\Traver\view
+     * @param $input
      */
-    public function testViewArrayObject()
+    public function testIn($input)
     {
         // given
-        $arrayObject = new \ArrayObject(["a", "b", "c"]);
+        $array = $input;
 
         // when
-        $view = \Traver\view($arrayObject);
+        $view = \Traver\in($array);
 
         // then
         self::assertInstanceOf(Enumerable::class, $view);
+    }
+
+    public function inProvider()
+    {
+        return [
+            [["a", "b", "c"]],
+            [new \ArrayObject(["a", "b", "c"])]
+        ];
     }
 
     /**
