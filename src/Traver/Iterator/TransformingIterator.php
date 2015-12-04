@@ -6,7 +6,7 @@ namespace Traver\Iterator;
 use Iterator;
 use OuterIterator;
 
-class MappingIterator implements OuterIterator
+class TransformingIterator implements OuterIterator
 {
     /**
      * @var Iterator
@@ -38,7 +38,9 @@ class MappingIterator implements OuterIterator
     public function current()
     {
         $function = $this->mappingFunction;
-        return $function($this->delegate->current());
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        list($key, $value) = $function($this->delegate->key(), $this->delegate->current(), $this->index);
+        return $value;
     }
 
     /**
@@ -55,7 +57,10 @@ class MappingIterator implements OuterIterator
      */
     public function key()
     {
-        return $this->delegate->key();
+        $function = $this->mappingFunction;
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        list($key, $value) = $function($this->delegate->key(), $this->delegate->current(), $this->index);
+        return $key;
     }
 
     /**

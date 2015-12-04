@@ -12,18 +12,25 @@ interface Enumerable extends \Traversable, \Countable
 {
     /**
      * Creates a new Enumerable by applying a function to all elements of {@link asTraversable()}.
-     * @param callable $mappingFunction the function to apply to each element. Arguments are: value, key.
-     * @param bool $preserveKeys
+     * @param callable $mappingFunction the function to apply to each value. Arguments are: value.
      * @return Enumerable A new traversable collection resulting from applying the given mappingFunction to each element
      * of this traversable collection and collecting the results.
      */
-    public function map(callable $mappingFunction, $preserveKeys = true);
+    public function map(callable $mappingFunction);
+
+    /**
+     * Creates a new Enumerable by applying a function to all key => value pairs of {@link asTraversable()}.
+     * @param callable $mappingFunction the function to apply to each element returning <code>[newKey, newValue]</code>. Arguments are: key, value, index.
+     * @return Enumerable A new traversable collection resulting from applying the given mappingFunction to each key => value pair
+     * of this traversable collection and collecting the results.
+     */
+    public function transform(callable $mappingFunction);
 
     /**
      * Selects the first element of this collection.
      * @return mixed
      * @throws NoSuchElementException if the traversable collection is empty.
-     * @see tail
+     * @see take
      */
     public function head();
 
@@ -32,7 +39,7 @@ interface Enumerable extends \Traversable, \Countable
      * The returned traversable preserves the keys.
      * @return Enumerable
      * @throws UnsupportedOperationException if the traversable collection is empty.
-     * @see head
+     * @see drop
      */
     public function tail();
 

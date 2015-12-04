@@ -7,6 +7,7 @@ namespace Traver\Test\UnitTest\Enumerable;
 use PhpOption\None;
 use PhpOption\Some;
 use PHPUnit_Framework_TestCase;
+use Traver\Callback\OperatorCallbacks;
 use Traver\Enumerable\Enumerable;
 use Traversable;
 
@@ -37,26 +38,72 @@ trait EnumerableTest
     }
 
     /**
+     * @dataProvider mapProvider
      * @covers ::map
+     * @param $array
+     * @param $mappingFunction
+     * @param $expected
      */
-    public function testMap()
+    public function testMap($array, $mappingFunction, $expected)
     {
         // given
-        $array = ["a", "b", "c"];
         $builder = $this->createBuilder();
         $builder->addAll($array);
         $enumerable = $builder->build();
-
-        $mappingFunction = function ($item) {
-            return $item . "_";
-        };
 
         // when
         $mapped = $enumerable->map($mappingFunction);
 
         // then
         PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $mapped);
-        PHPUnit_Framework_TestCase::assertEquals(array_map($mappingFunction, $array), iterator_to_array($mapped));
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($mapped));
+    }
+
+    public function mapProvider()
+    {
+        return [
+            [["a", "b", "c"], function ($item) {
+                return $item . "_";
+            }, ["a_", "b_", "c_"]],
+            [["a", "b", "c"], 'ucfirst', ["A", "B", "C"]],
+            [[], function ($value) {
+                return $value;
+            }, []]
+        ];
+    }
+
+    /**
+     * @dataProvider transformProvider
+     * @covers ::transform
+     * @param $array
+     * @param $mappingFunction
+     * @param $expected
+     */
+    public function testTransform($array, $mappingFunction, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $mapped = $enumerable->transform($mappingFunction);
+
+        // then
+        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $mapped);
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($mapped));
+    }
+
+    public function transformProvider()
+    {
+        return [
+            [["a", "b", "c"], function ($key, $value, $index) {
+                return [$index, $value . $key];
+            }, ["a0", "b1", "c2"]],
+            [[], function ($key, $value, $index) {
+                return [$key, $value];
+            }, []]
+        ];
     }
 
     /**
@@ -752,7 +799,8 @@ trait EnumerableTest
             }, 16],
             [["a", "b", "foo" => "c"], function ($a, $b) {
                 return $a . $b;
-            }, "abc"]
+            }, "abc"],
+            [[1, 2, 3], array(OperatorCallbacks::class, 'add'), 6]
         ];
     }
 

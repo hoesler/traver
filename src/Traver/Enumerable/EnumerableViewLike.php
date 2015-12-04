@@ -13,6 +13,7 @@ use Traver\Iterator\CallbackLimitIterator;
 use Traver\Iterator\CallbackOffsetIterator;
 use Traver\Iterator\ConcatIterator;
 use Traver\Iterator\MappingIterator;
+use Traver\Iterator\TransformingIterator;
 
 trait EnumerableViewLike
 {
@@ -23,9 +24,14 @@ trait EnumerableViewLike
      */
     private $delegate;
 
-    public function map(callable $mappingFunction, $preserveKeys = true)
+    public function map(callable $mappingFunction)
     {
-        return new Mapped($this, $mappingFunction, $preserveKeys);
+        return new Mapped($this, $mappingFunction);
+    }
+
+    public function transform(callable $mappingFunction)
+    {
+        return new Transformed($this, $mappingFunction);
     }
 
     public function tail()
@@ -76,8 +82,8 @@ trait EnumerableViewLike
     public function keys()
     {
         /** @noinspection PhpUnusedParameterInspection */
-        return new Mapped($this, function ($value, $key) {
-            return $key;
+        return new Transformed($this, function ($key, $value, $index) {
+            return [$index, $key];
         }, false);
     }
 
@@ -102,12 +108,21 @@ trait EnumerableViewLike
         return $this->getIterator();
     }
 
-    protected function builder()
+    /**
+     * @codeCoverageIgnore
+     */
+    final protected function builder()
     {
         throw new UnsupportedOperationException("EnumerableView does not support builder");
     }
 }
 
+/**
+ * Class Filtered
+ * @package Traver\Enumerable
+ * @codeCoverageIgnore
+ * @internal
+ */
 class Filtered implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
@@ -134,6 +149,12 @@ class Filtered implements \IteratorAggregate, Enumerable
     }
 }
 
+/**
+ * Class DroppedWhile
+ * @package Traver\Enumerable
+ * @codeCoverageIgnore
+ * @internal
+ */
 class DroppedWhile implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
@@ -160,6 +181,12 @@ class DroppedWhile implements \IteratorAggregate, Enumerable
     }
 }
 
+/**
+ * Class TakenWhile
+ * @package Traver\Enumerable
+ * @codeCoverageIgnore
+ * @internal
+ */
 class TakenWhile implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
@@ -186,6 +213,12 @@ class TakenWhile implements \IteratorAggregate, Enumerable
     }
 }
 
+/**
+ * Class Sliced
+ * @package Traver\Enumerable
+ * @codeCoverageIgnore
+ * @internal
+ */
 class Sliced implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
@@ -225,6 +258,12 @@ class Sliced implements \IteratorAggregate, Enumerable
     }
 }
 
+/**
+ * Class Mapped
+ * @package Traver\Enumerable
+ * @codeCoverageIgnore
+ * @internal
+ */
 class Mapped implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;
@@ -233,30 +272,62 @@ class Mapped implements \IteratorAggregate, Enumerable
      * @var callable
      */
     private $mappingFunction;
-    /**
-     * @var int
-     */
-    private $preserveKeys;
 
     /**
      * MapView constructor.
      * @param EnumerableViewLike $delegate
      * @param callable $mappingFunction
-     * @param bool $preserveKeys
      */
-    public function __construct($delegate, $mappingFunction, $preserveKeys = true)
+    public function __construct($delegate, $mappingFunction)
     {
         $this->mappingFunction = $mappingFunction;
         $this->delegate = $delegate;
-        $this->preserveKeys = $preserveKeys;
     }
 
     public function getIterator()
     {
-        return new MappingIterator($this->delegate->getIterator(), $this->mappingFunction, $this->preserveKeys);
+        return new MappingIterator($this->delegate->getIterator(), $this->mappingFunction);
     }
 }
 
+/**
+ * Class Transformed
+ * @package Traver\Enumerable
+ * @codeCoverageIgnore
+ * @internal
+ */
+class Transformed implements \IteratorAggregate, Enumerable
+{
+    use EnumerableViewLike;
+
+    /**
+     * @var callable
+     */
+    private $mappingFunction;
+
+    /**
+     * MapView constructor.
+     * @param EnumerableViewLike $delegate
+     * @param callable $mappingFunction
+     */
+    public function __construct($delegate, $mappingFunction)
+    {
+        $this->mappingFunction = $mappingFunction;
+        $this->delegate = $delegate;
+    }
+
+    public function getIterator()
+    {
+        return new TransformingIterator($this->delegate->getIterator(), $this->mappingFunction);
+    }
+}
+
+/**
+ * Class FlatMapped
+ * @package Traver\Enumerable
+ * @codeCoverageIgnore
+ * @internal
+ */
 class FlatMapped implements \IteratorAggregate, Enumerable
 {
     use EnumerableViewLike;

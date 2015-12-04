@@ -21,15 +21,29 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::map}.
      * @param callable $mappingFunction
-     * @param bool $preserveKeys
      * @return Enumerable
      */
-    public function map(callable $mappingFunction, $preserveKeys = true)
+    public function map(callable $mappingFunction)
+    {
+        $builder = $this->builder();
+        foreach ($this->asTraversable() as $key => $value) {
+            $builder->add($mappingFunction($value), $key);
+        }
+        return $builder->build();
+    }
+
+    /**
+     * Implements {@link Enumerable::transform}.
+     * @param callable $mappingFunction
+     * @return Enumerable
+     */
+    public function transform(callable $mappingFunction)
     {
         $builder = $this->builder();
         $index = 0;
-        foreach ($this->asTraversable() as $key => $element) {
-            $builder->add($mappingFunction($element, $key), ($preserveKeys) ? $key : $index);
+        foreach ($this->asTraversable() as $key => $value) {
+            list($newKey, $newValue) = $mappingFunction($key, $value, $index);
+            $builder->add($newValue, $newKey);
             $index++;
         }
         return $builder->build();
@@ -55,6 +69,7 @@ trait EnumerableLike
 
     /**
      * Implements {@link Enumerable::tail}.
+     * @return Enumerable
      */
     public function tail()
     {
@@ -66,6 +81,7 @@ trait EnumerableLike
 
     /**
      * Implements {@link Enumerable::isEmpty}.
+     * @return bool
      */
     public function isEmpty()
     {
@@ -89,6 +105,7 @@ trait EnumerableLike
 
     /**
      * Implements {@link Enumerable::count}.
+     * @return int
      */
     public function count()
     {
@@ -385,9 +402,9 @@ trait EnumerableLike
     public function keys()
     {
         /** @noinspection PhpUnusedParameterInspection */
-        return $this->map(function ($value, $key) {
-            return $key;
-        }, false);
+        return $this->transform(function ($key, $value, $index) {
+            return [$index, $key];
+        });
     }
 
     /**
