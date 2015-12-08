@@ -7,6 +7,7 @@ namespace Traver\Enumerable;
 use PhpOption\None;
 use PhpOption\Option;
 use PhpOption\Some;
+use Traver\Callback\Callbacks;
 use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
 use Traversable;
@@ -25,24 +26,26 @@ trait EnumerableLike
      */
     public function map(callable $mappingFunction)
     {
+        $mappingFunction = self::wrapCallback($mappingFunction);
         $builder = $this->builder();
         foreach ($this->asTraversable() as $key => $value) {
-            $builder->add($mappingFunction($value), $key);
+            $builder->add($mappingFunction($value, $key), $key);
         }
         return $builder->build();
     }
 
     /**
-     * Implements {@link Enumerable::transform}.
-     * @param callable $mappingFunction
+     * @param callable $transformationFunction
      * @return Enumerable
+     * @codeCoverageIgnore
+     * @internal
      */
-    public function transform(callable $mappingFunction)
+    private function transform(callable $transformationFunction)
     {
         $builder = $this->builder();
         $index = 0;
         foreach ($this->asTraversable() as $key => $value) {
-            list($newKey, $newValue) = $mappingFunction($key, $value, $index);
+            list($newKey, $newValue) = $transformationFunction($key, $value, $index);
             $builder->add($newValue, $newKey);
             $index++;
         }
@@ -119,6 +122,7 @@ trait EnumerableLike
      */
     public function countWhich(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         return iterator_count($this->select($predicate));
     }
 
@@ -163,14 +167,15 @@ trait EnumerableLike
      */
     public function dropWhile(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         $builder = $this->builder();
         $go = false;
-        foreach ($this->asTraversable() as $key => $element) {
-            if (!$go && !$predicate($element, $key)) {
+        foreach ($this->asTraversable() as $key => $value) {
+            if (!$go && !$predicate($value, $key)) {
                 $go = true;
             }
             if ($go) {
-                $builder->add($element, $key);
+                $builder->add($value, $key);
             }
         }
         return $builder->build();
@@ -193,29 +198,15 @@ trait EnumerableLike
      */
     public function takeWhile(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         $builder = $this->builder();
-        foreach ($this->asTraversable() as $key => $element) {
-            if (!$predicate($element, $key)) {
+        foreach ($this->asTraversable() as $key => $value) {
+            if (!$predicate($value, $key)) {
                 break;
             }
-            $builder->add($element, $key);
+            $builder->add($value, $key);
         }
         return $builder->build();
-    }
-
-    /**
-     * Implements {@link Enumerable::exists}.
-     * @param callable $predicate
-     * @return bool
-     */
-    public function exists(callable $predicate)
-    {
-        foreach ($this as $key => $value) {
-            if ($predicate($value, $key)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -225,10 +216,12 @@ trait EnumerableLike
      */
     public function select(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         $builder = $this->builder();
-        foreach ($this->asTraversable() as $key => $element) {
-            if ($predicate($element, $key)) {
-                $builder->add($element, $key);
+        foreach ($this->asTraversable() as $key => $value) {
+            $accepted = $predicate($value, $key);
+            if ($accepted) {
+                $builder->add($value, $key);
             }
         }
         return $builder->build();
@@ -241,9 +234,15 @@ trait EnumerableLike
      */
     public function reject(callable $predicate)
     {
-        return $this->select(function ($element, $key) use ($predicate) {
-            return !$predicate($element, $key);
-        });
+        $predicate = self::wrapCallback($predicate);
+        $builder = $this->builder();
+        foreach ($this->asTraversable() as $key => $value) {
+            $rejected = $predicate($value, $key);
+            if (!$rejected) {
+                $builder->add($value, $key);
+            }
+        }
+        return $builder->build();
     }
 
     /**
@@ -253,10 +252,11 @@ trait EnumerableLike
      */
     public function find(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         $result = None::create();
-        foreach ($this->asTraversable() as $key => $element) {
-            if ($predicate($element, $key)) {
-                $result = Option::fromValue($element);
+        foreach ($this->asTraversable() as $key => $value) {
+            if ($predicate($value, $key)) {
+                $result = Option::fromValue($value);
             }
         }
         return $result;
@@ -269,9 +269,10 @@ trait EnumerableLike
      */
     public function flatMap(callable $mappingFunction)
     {
+        $mappingFunction = self::wrapCallback($mappingFunction);
         $builder = $this->builder();
-        foreach ($this->asTraversable() as $key => $element) {
-            $array = $mappingFunction($element, $key);
+        foreach ($this->asTraversable() as $key => $value) {
+            $array = $mappingFunction($value, $key);
             if (is_array($array) || $array instanceof Traversable) {
                 $builder->addAll($array, false);
             } else {
@@ -288,6 +289,7 @@ trait EnumerableLike
      */
     public function all(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         foreach ($this->asTraversable() as $key => $value) {
             if (!$predicate($value, $key)) {
                 return false;
@@ -303,6 +305,7 @@ trait EnumerableLike
      */
     public function any(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         foreach ($this->asTraversable() as $key => $value) {
             if ($predicate($value, $key)) {
                 return true;
@@ -318,6 +321,7 @@ trait EnumerableLike
      */
     public function groupBy(callable $keyFunction)
     {
+        $keyFunction = self::wrapCallback($keyFunction);
         $result = [];
         foreach ($this->asTraversable() as $key => $value) {
             $groupKey = $keyFunction($value, $key);
@@ -408,13 +412,38 @@ trait EnumerableLike
     }
 
     /**
+     * Implements {@link Enumerable::values}.
+     * @return Enumerable
+     */
+    public function values()
+    {
+        /** @noinspection PhpUnusedParameterInspection */
+        return $this->transform(function ($key, $value, $index) {
+            return [$index, $value];
+        });
+    }
+
+    /**
+     * Implements {@link Enumerable::entries}.
+     * @return Enumerable
+     */
+    public function entries()
+    {
+        /** @noinspection PhpUnusedParameterInspection */
+        return $this->transform(function ($key, $value, $index) {
+            return [$index, [$key, $value]];
+        });
+    }
+
+    /**
      * Implements {@link Enumerable::each}.
      * @param callable $f
      */
     public function each(callable $f)
     {
-        foreach ($this->asTraversable() as $key => $element) {
-            $f($element, $key);
+        $f = self::wrapCallback($f);
+        foreach ($this->asTraversable() as $key => $value) {
+            $f($value, $key);
         }
     }
 
@@ -429,4 +458,29 @@ trait EnumerableLike
      * @return Builder
      */
     abstract protected function builder();
+
+    /**
+     * Wraps the given callback in a callback which has two arguments (value, key),
+     * if the given callback accepts only one argument (assumed as value).
+     * Allows for callbacks which expect exactly one argument like {@link ucfirst} or {@link is_string},
+     * @param callable $callback
+     * @return \Closure
+     */
+    protected static function wrapCallback(callable $callback)
+    {
+        $reflection = Callbacks::createReflectionFunction($callback);
+        $numberOfParameters = $reflection->getNumberOfParameters();
+
+        $proxy = $callback;
+
+        if ($numberOfParameters == 1) {
+            /** @noinspection PhpUnusedParameterInspection */
+            /** @noinspection PhpDocSignatureInspection */
+            $proxy = function ($value, $key) use ($callback) {
+                return $callback($value);
+            };
+        }
+
+        return $proxy;
+    }
 }

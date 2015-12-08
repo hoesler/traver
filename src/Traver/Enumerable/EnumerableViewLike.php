@@ -26,12 +26,11 @@ trait EnumerableViewLike
 
     public function map(callable $mappingFunction)
     {
-        return new Mapped($this, $mappingFunction);
-    }
-
-    public function transform(callable $mappingFunction)
-    {
-        return new Transformed($this, $mappingFunction);
+        $mappingFunction = self::wrapCallback($mappingFunction);
+        /** @noinspection PhpUnusedParameterInspection */
+        return new Transformed($this, function ($key, $value, $index) use ($mappingFunction) {
+            return [$index, $mappingFunction($value, $key)];
+        });
     }
 
     public function tail()
@@ -49,6 +48,7 @@ trait EnumerableViewLike
 
     public function dropWhile(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         return new DroppedWhile($this, $predicate);
     }
 
@@ -59,23 +59,27 @@ trait EnumerableViewLike
 
     public function takeWhile(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         return new TakenWhile($this, $predicate);
     }
 
     public function select(callable $predicate)
     {
+        $predicate = self::wrapCallback($predicate);
         return new Filtered($this, $predicate);
     }
 
     public function reject(callable $predicate)
     {
-        return new Filtered($this, function ($value, $key) use ($predicate) {
-            return !$predicate($value, $key);
+        $predicate = self::wrapCallback($predicate);
+        return new Filtered($this, function ($key, $value) use ($predicate) {
+            return !$predicate($key, $value);
         });
     }
 
     public function flatMap(callable $mappingFunction)
     {
+        $mappingFunction = self::wrapCallback($mappingFunction);
         return new FlatMapped($this, $mappingFunction);
     }
 
@@ -84,7 +88,23 @@ trait EnumerableViewLike
         /** @noinspection PhpUnusedParameterInspection */
         return new Transformed($this, function ($key, $value, $index) {
             return [$index, $key];
-        }, false);
+        });
+    }
+
+    public function values()
+    {
+        /** @noinspection PhpUnusedParameterInspection */
+        return new Transformed($this, function ($key, $value, $index) {
+            return [$index, $value];
+        });
+    }
+
+    public function entries()
+    {
+        /** @noinspection PhpUnusedParameterInspection */
+        return new Transformed($this, function ($key, $value, $index) {
+            return [$index, [$key, $value]];
+        });
     }
 
     public function slice($from, $until)
@@ -94,6 +114,7 @@ trait EnumerableViewLike
 
     public function groupBy(callable $keyFunction)
     {
+        $keyFunction = self::wrapCallback($keyFunction);
         $arrayObjectEnumerable = new ArrayObjectEnumerable($this->toArray());
         return $arrayObjectEnumerable->groupBy($keyFunction);
     }
@@ -255,38 +276,6 @@ class Sliced implements \IteratorAggregate, Enumerable
         } else {
             return new LimitIterator($this->delegate->getIterator(), $offset, $count);
         }
-    }
-}
-
-/**
- * Class Mapped
- * @package Traver\Enumerable
- * @codeCoverageIgnore
- * @internal
- */
-class Mapped implements \IteratorAggregate, Enumerable
-{
-    use EnumerableViewLike;
-
-    /**
-     * @var callable
-     */
-    private $mappingFunction;
-
-    /**
-     * MapView constructor.
-     * @param EnumerableViewLike $delegate
-     * @param callable $mappingFunction
-     */
-    public function __construct($delegate, $mappingFunction)
-    {
-        $this->mappingFunction = $mappingFunction;
-        $this->delegate = $delegate;
-    }
-
-    public function getIterator()
-    {
-        return new MappingIterator($this->delegate->getIterator(), $this->mappingFunction);
     }
 }
 

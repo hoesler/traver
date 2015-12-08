@@ -38,7 +38,7 @@ class MappingIterator implements OuterIterator
     public function current()
     {
         $function = $this->mappingFunction;
-        return $function($this->delegate->current());
+        return $function($this->delegate->current(), $this->key());
     }
 
     /**

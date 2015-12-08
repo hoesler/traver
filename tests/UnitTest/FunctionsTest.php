@@ -104,4 +104,19 @@ class FunctionsTest extends PHPUnit_Framework_TestCase
         // then
         self::assertEquals(array_map($mappingFunction, $array), $mapped);
     }
+
+    /**
+     * @covers ::\Traver\reduce
+     */
+    public function test_reduce()
+    {
+        // given
+        $array = [1, 2, 3];
+
+        // when
+        $reduced = \Traver\reduce($array, \Traver\op("+"));
+
+        // then
+        self::assertEquals(6, $reduced);
+    }
 }

@@ -19,14 +19,6 @@ interface Enumerable extends \Traversable, \Countable
     public function map(callable $mappingFunction);
 
     /**
-     * Creates a new Enumerable by applying a function to all key => value pairs of {@link asTraversable()}.
-     * @param callable $mappingFunction the function to apply to each element returning <code>[newKey, newValue]</code>. Arguments are: key, value, index.
-     * @return Enumerable A new traversable collection resulting from applying the given mappingFunction to each key => value pair
-     * of this traversable collection and collecting the results.
-     */
-    public function transform(callable $mappingFunction);
-
-    /**
      * Selects the first element of this collection.
      * @return mixed
      * @throws NoSuchElementException if the traversable collection is empty.
@@ -79,13 +71,6 @@ interface Enumerable extends \Traversable, \Countable
      * @return Enumerable
      */
     public function takeWhile(callable $predicate);
-
-    /**
-     * Tests whether a predicate holds for some of the elements of the enumerable.
-     * @param callable $predicate
-     * @return bool
-     */
-    public function exists(callable $predicate);
 
     /**
      * Selects all elements of the enumerable which satisfy a predicate.
@@ -182,15 +167,29 @@ interface Enumerable extends \Traversable, \Countable
 
     /**
      * Apply function f to all elements in this enumerable.
+     * If the callback accepts one argument, is is called with $f(value).
+     * If it accepts two arguments, it is called with $f(key, value).
      * @param callable $f
      */
     public function each(callable $f);
 
     /**
-     * Returns the keys for all elements.
+     * Returns a new enumerable with the keys of this enumerable as values and their index as keys.
      * @return Enumerable
      */
     public function keys();
+
+    /**
+     * Returns a new enumerable with the values of this enumerable as values and their index as keys.
+     * @return Enumerable
+     */
+    public function values();
+
+    /**
+     * Transforms this enumerable to a new enumerable with the current (key, value) pairs as values and their index as keys.
+     * @return Enumerable
+     */
+    public function entries();
 
     /**
      * Tests if this collection is empty.
@@ -206,7 +205,7 @@ interface Enumerable extends \Traversable, \Countable
     public function toArray($preserveKeys = true);
 
     /**
-     * Returns this Enumerable as a traversable collection.
+     * Returns this enumerable as a traversable collection.
      * <p>This function is primarily a workaround to the inability of traits to implement interfaces.
      * Because all classes implementing Enumerable should also implement {@link Traversable},
      * most implementation simply return <code>$this</code>.</p>

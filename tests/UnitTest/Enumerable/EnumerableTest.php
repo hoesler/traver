@@ -62,46 +62,15 @@ trait EnumerableTest
     public function mapProvider()
     {
         return [
-            [["a", "b", "c"], function ($item) {
-                return $item . "_";
+            [["a", "b", "c"], function ($value) {
+                return $value . "_";
             }, ["a_", "b_", "c_"]],
+            [["a", "b", "c"], function ($value, $key) {
+                return $key . $value;
+            }, ["0a", "1b", "2c"]],
             [["a", "b", "c"], 'ucfirst', ["A", "B", "C"]],
             [[], function ($value) {
                 return $value;
-            }, []]
-        ];
-    }
-
-    /**
-     * @dataProvider transformProvider
-     * @covers ::transform
-     * @param $array
-     * @param $mappingFunction
-     * @param $expected
-     */
-    public function testTransform($array, $mappingFunction, $expected)
-    {
-        // given
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-
-        // when
-        $mapped = $enumerable->transform($mappingFunction);
-
-        // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $mapped);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($mapped));
-    }
-
-    public function transformProvider()
-    {
-        return [
-            [["a", "b", "c"], function ($key, $value, $index) {
-                return [$index, $value . $key];
-            }, ["a0", "b1", "c2"]],
-            [[], function ($key, $value, $index) {
-                return [$key, $value];
             }, []]
         ];
     }
@@ -268,7 +237,28 @@ trait EnumerableTest
 
         // when
         $enumerable->each(function ($value, $key) use (&$newArray) {
-            $newArray[$key] = $value;
+            $newArray[$key] = $value . $key;
+        });
+
+        // then
+        PHPUnit_Framework_TestCase::assertEquals(['a0', 'b1', 'c2'], $newArray);
+    }
+
+    /**
+     * @covers ::each
+     */
+    public function testEachOneParameters()
+    {
+        // given
+        $array = ["a", "b", "c"];
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+        $newArray = [];
+
+        // when
+        $enumerable->each(function ($value) use (&$newArray) {
+            $newArray[] = $value;
         });
 
         // then
@@ -323,8 +313,8 @@ trait EnumerableTest
         $enumerable = $builder->build();
 
         // when
-        $count = $enumerable->countWhich(function ($el) {
-            return $el < 10;
+        $count = $enumerable->countWhich(function ($value) {
+            return $value < 10;
         });
 
         // then
@@ -360,8 +350,8 @@ trait EnumerableTest
         $builder = $this->createBuilder();
         $builder->addAll($array);
         $enumerable = $builder->build();
-        $predicate = function ($el) {
-            return $el > 5;
+        $predicate = function ($value) {
+            return $value > 5;
         };
 
         // when
@@ -428,80 +418,51 @@ trait EnumerableTest
     public function takeWhileProvider()
     {
         return [
-            [[10, 5, 1], function ($el) {
-                return $el >= 5;
+            [[10, 5, 1], function ($value) {
+                return $value >= 5;
             }, [10, 5]],
-            [[10, 5, 1], function ($el) {
-                return $el <= 5;
+            [[10, 5, 1], function ($value) {
+                return $value <= 5;
             }, []],
-            [[], function ($el) {
+            [[], function ($value) {
                 return true;
             }, []]
         ];
     }
 
     /**
-     * @covers ::exists
-     */
-    public function testExists()
-    {
-        // given
-        $array = [10, 5, 1];
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-        $predicate = function ($el) {
-            return $el > 5;
-        };
-
-        // when
-        $exists = $enumerable->exists($predicate);
-
-        // then
-        PHPUnit_Framework_TestCase::assertTrue($exists);
-    }
-
-    /**
-     * @covers ::exists
-     */
-    public function testExistsNot()
-    {
-        // given
-        $array = [10, 5, 1];
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-        $predicate = function ($el) {
-            return $el > 10;
-        };
-
-        // when
-        $exists = $enumerable->exists($predicate);
-
-        // then
-        PHPUnit_Framework_TestCase::assertFalse($exists);
-    }
-
-    /**
      * @covers ::select
+     * @dataProvider selectProvider
+     * @param $array
+     * @param $predicate
+     * @param $expected
      */
-    public function testSelect()
+    public function testSelect($array, $predicate, $expected)
     {
         // given
-        $array = ["a", "b", "c"];
         $builder = $this->createBuilder();
         $builder->addAll($array);
         $enumerable = $builder->build();
-        $predicate = function ($el) {
-            return $el != "b";
-        };
 
         // when
         $filtered = $enumerable->select($predicate);
 
         // then
         PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $filtered);
-        PHPUnit_Framework_TestCase::assertEquals(array_filter($array, $predicate), iterator_to_array($filtered));
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($filtered));
+    }
+
+    public function selectProvider()
+    {
+        return [
+            [["a", "b", "c"], function ($value) {
+                return $value != "b";
+            }, [0 => "a", 2 => "c"]],
+            [["a", "b", "c"], function ($value, $key) {
+                return $key != 1;
+            }, [0 => "a", 2 => "c"]],
+            [[24, "b", null], 'is_string', [1 => "b"]]
+        ];
     }
 
     /**
@@ -1011,6 +972,66 @@ trait EnumerableTest
         return [
             [["a", "b", "c"], [0, 1, 2]],
             [["a" => 1, "b" => 2, "c" => 3], ["a", "b", "c"]],
+            [[], []]
+        ];
+    }
+
+    /**
+     * @covers ::values
+     * @dataProvider valuesProvider
+     * @param $array
+     * @param $expected
+     */
+    public function testValues($array, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $keys = $enumerable->values();
+
+        // then
+        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $keys);
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($keys));
+    }
+
+    public function valuesProvider()
+    {
+        return [
+            [[3 => "a", 4 => "b", 30 => "c"], ["a", "b", "c"]],
+            [["a" => 1, "b" => 2, "c" => 3], [1, 2, 3]],
+            [[], []]
+        ];
+    }
+
+    /**
+     * @covers ::entries
+     * @dataProvider entriesProvider
+     * @param $array
+     * @param $expected
+     */
+    public function testEntries($array, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $keys = $enumerable->entries();
+
+        // then
+        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $keys);
+        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($keys));
+    }
+
+    public function entriesProvider()
+    {
+        return [
+            [["a", "b", "c"], [[0, "a"], [1, "b"], [2, "c"]]],
+            [["a" => 1, "b" => 2, "c" => 3], [["a", 1], ["b", 2], ["c", 3]]],
             [[], []]
         ];
     }

@@ -4,6 +4,7 @@ namespace Traver;
 
 use ArrayObject;
 use IteratorAggregate;
+use Traver\Callback\OperatorCallbacks;
 use Traver\Enumerable\Enumerable;
 use Traver\Enumerable\EnumerableView;
 use Traversable;
@@ -67,5 +68,34 @@ if (!function_exists('Traver\map')) {
     function map($collection, callable $mappingFunction)
     {
         return view($collection)->map($mappingFunction)->toArray();
+    }
+}
+
+if (!function_exists('Traver\reduce')) {
+    /**
+     * @param array|Traversable $collection
+     * @param callback $binaryFunction
+     * @param null $initial
+     * @return array
+     */
+    function reduce($collection, $binaryFunction, $initial = null)
+    {
+        if (func_num_args() == 1) {
+            return view($collection)->reduce($binaryFunction);
+        } else {
+            return view($collection)->reduce($binaryFunction, $initial);
+        }
+    }
+}
+
+if (!function_exists('Traver\op')) {
+    /**
+     * @param string $operator
+     * @return callable
+     */
+    function op($operator)
+    {
+        return OperatorCallbacks::forOperator($operator)
+            ->getOrThrow(new \RuntimeException("No function defined for operator $operator"));
     }
 }
