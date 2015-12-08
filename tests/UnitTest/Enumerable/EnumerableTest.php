@@ -16,7 +16,7 @@ use Traversable;
  * @package Traver\Test\UnitTest\Enumerable
  * @coversDefaultClass \Traver\Enumerable\Enumerable
  */
-trait EnumerableTest
+abstract class EnumerableTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::asTraversable
@@ -33,8 +33,8 @@ trait EnumerableTest
         $iterable2 = $enumerable->asTraversable();
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Traversable::class, $iterable2);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($iterable2));
+        self::assertInstanceOf(Traversable::class, $iterable2);
+        self::assertEquals($expected, iterator_to_array($iterable2));
     }
 
     /**
@@ -55,8 +55,8 @@ trait EnumerableTest
         $mapped = $enumerable->map($mappingFunction);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $mapped);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($mapped));
+        self::assertInstanceOf(Enumerable::class, $mapped);
+        self::assertEquals($expected, iterator_to_array($mapped));
     }
 
     public function mapProvider()
@@ -90,7 +90,7 @@ trait EnumerableTest
         $head = $enumerable->head();
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals("a", $head);
+        self::assertEquals("a", $head);
     }
 
     /**
@@ -109,7 +109,7 @@ trait EnumerableTest
         $enumerable->head();
 
         // then
-        PHPUnit_Framework_TestCase::fail();
+        self::fail();
     }
 
     /**
@@ -127,8 +127,8 @@ trait EnumerableTest
         $tail = $enumerable->tail();
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $tail);
-        PHPUnit_Framework_TestCase::assertEquals(array_slice($array, 1, null, true), iterator_to_array($tail));
+        self::assertInstanceOf(Enumerable::class, $tail);
+        self::assertEquals(array_slice($array, 1, null, true), iterator_to_array($tail));
     }
 
     /**
@@ -147,7 +147,7 @@ trait EnumerableTest
         $enumerable->tail();
 
         // then
-        PHPUnit_Framework_TestCase::fail("tail did not throw an UnsupportedOperationException on empty collection");
+        self::fail("tail did not throw an UnsupportedOperationException on empty collection");
     }
 
     /**
@@ -165,7 +165,7 @@ trait EnumerableTest
         $isEmpty = $enumerable->isEmpty();
 
         // then
-        PHPUnit_Framework_TestCase::assertTrue($isEmpty);
+        self::assertTrue($isEmpty);
     }
 
     /**
@@ -183,7 +183,7 @@ trait EnumerableTest
         $isEmpty = $enumerable->isEmpty();
 
         // then
-        PHPUnit_Framework_TestCase::assertFalse($isEmpty);
+        self::assertFalse($isEmpty);
     }
 
     /**
@@ -207,7 +207,7 @@ trait EnumerableTest
 
         // then
         $actual = iterator_to_array($slice, true);
-        PHPUnit_Framework_TestCase::assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function sliceProvider()
@@ -241,7 +241,7 @@ trait EnumerableTest
         });
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals(['a0', 'b1', 'c2'], $newArray);
+        self::assertEquals(['a0', 'b1', 'c2'], $newArray);
     }
 
     /**
@@ -262,7 +262,7 @@ trait EnumerableTest
         });
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($array, $newArray);
+        self::assertEquals($array, $newArray);
     }
 
     /**
@@ -280,7 +280,7 @@ trait EnumerableTest
         $toArray = $enumerable->toArray(true);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($array, $toArray);
+        self::assertEquals($array, $toArray);
     }
 
     /**
@@ -298,7 +298,7 @@ trait EnumerableTest
         $count = $enumerable->count();
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals(3, $count);
+        self::assertEquals(3, $count);
     }
 
     /**
@@ -318,7 +318,7 @@ trait EnumerableTest
         });
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals(2, $count);
+        self::assertEquals(2, $count);
     }
 
     /**
@@ -336,8 +336,8 @@ trait EnumerableTest
         $drop = $enumerable->drop(2);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $drop);
-        PHPUnit_Framework_TestCase::assertEquals(array_slice($array, 2, null, true), iterator_to_array($drop));
+        self::assertInstanceOf(Enumerable::class, $drop);
+        self::assertEquals(array_slice($array, 2, null, true), iterator_to_array($drop));
     }
 
     /**
@@ -358,8 +358,8 @@ trait EnumerableTest
         $dropWhile = $enumerable->dropWhile($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $dropWhile);
-        PHPUnit_Framework_TestCase::assertEquals(array_slice($array, 1, null, true), iterator_to_array($dropWhile));
+        self::assertInstanceOf(Enumerable::class, $dropWhile);
+        self::assertEquals(array_slice($array, 1, null, true), iterator_to_array($dropWhile));
     }
 
     /**
@@ -380,8 +380,8 @@ trait EnumerableTest
         $taken = $enumerable->take($n);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $taken);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($taken));
+        self::assertInstanceOf(Enumerable::class, $taken);
+        self::assertEquals($expected, iterator_to_array($taken));
     }
 
     public function takeProvider()
@@ -411,8 +411,8 @@ trait EnumerableTest
         $taken = $enumerable->takeWhile($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $taken);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($taken));
+        self::assertInstanceOf(Enumerable::class, $taken);
+        self::assertEquals($expected, iterator_to_array($taken));
     }
 
     public function takeWhileProvider()
@@ -448,8 +448,8 @@ trait EnumerableTest
         $filtered = $enumerable->select($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $filtered);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($filtered));
+        self::assertInstanceOf(Enumerable::class, $filtered);
+        self::assertEquals($expected, iterator_to_array($filtered));
     }
 
     public function selectProvider()
@@ -483,12 +483,12 @@ trait EnumerableTest
         $filtered = $enumerable->reject($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $filtered);
+        self::assertInstanceOf(Enumerable::class, $filtered);
         $actual = iterator_to_array($filtered);
         $expected = array_filter($array, function ($value, $key) use ($predicate) {
             return !$predicate($value, $key);
         }, ARRAY_FILTER_USE_BOTH);
-        PHPUnit_Framework_TestCase::assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
     public function testMethodChaining()
@@ -513,7 +513,7 @@ trait EnumerableTest
             ->head();
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals('c_', $head);
+        self::assertEquals('c_', $head);
     }
 
     /**
@@ -534,8 +534,8 @@ trait EnumerableTest
         $var = $enumerable->find($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Some::class, $var);
-        PHPUnit_Framework_TestCase::assertEquals("b", $var->get());
+        self::assertInstanceOf(Some::class, $var);
+        self::assertEquals("b", $var->get());
     }
 
     /**
@@ -556,7 +556,7 @@ trait EnumerableTest
         $var = $enumerable->find($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(None::class, $var);
+        self::assertInstanceOf(None::class, $var);
     }
 
     /**
@@ -577,7 +577,7 @@ trait EnumerableTest
         $var = $enumerable->flatMap($mappingFunction);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($var));
+        self::assertEquals($expected, iterator_to_array($var));
     }
 
     public function flatMapProvider()
@@ -626,7 +626,7 @@ trait EnumerableTest
         $all = $enumerable->all($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($expected, $all);
+        self::assertEquals($expected, $all);
     }
 
     public function allProvider()
@@ -665,7 +665,7 @@ trait EnumerableTest
         $any = $enumerable->any($predicate);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($expected, $any);
+        self::assertEquals($expected, $any);
     }
 
     public function anyProvider()
@@ -704,18 +704,18 @@ trait EnumerableTest
         $group = $enumerable->groupBy($keyFunction);
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $group);
-        PHPUnit_Framework_TestCase::assertEquals(array_keys($expected), array_keys(iterator_to_array($group)),
+        self::assertInstanceOf(Enumerable::class, $group);
+        self::assertEquals(array_keys($expected), array_keys(iterator_to_array($group)),
             "Group keys differ.");
         $allValuesAreEnumerables = array_reduce(array_values(iterator_to_array($group)), function ($all, $e) {
             return $all && ($e instanceof Enumerable);
         }, true);
-        PHPUnit_Framework_TestCase::assertTrue($allValuesAreEnumerables);
+        self::assertTrue($allValuesAreEnumerables);
 
         $actualAsArray = array_map(function ($e) {
             return iterator_to_array($e);
         }, iterator_to_array($group));
-        PHPUnit_Framework_TestCase::assertEquals($expected, $actualAsArray);
+        self::assertEquals($expected, $actualAsArray);
     }
 
     public function groupByProvider()
@@ -749,7 +749,7 @@ trait EnumerableTest
         $reduced = $enumerable->reduce($binaryFunction);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($expected, $reduced);
+        self::assertEquals($expected, $reduced);
     }
 
     public function reduceProvider()
@@ -780,7 +780,7 @@ trait EnumerableTest
         });
 
         // then
-        PHPUnit_Framework_TestCase::fail();
+        self::fail();
     }
 
     /**
@@ -802,7 +802,7 @@ trait EnumerableTest
         $reduced = $enumerable->reduce($binaryFunction, $initialValue);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($expected, $reduced);
+        self::assertEquals($expected, $reduced);
     }
 
     public function reduceInjectProvider()
@@ -841,7 +841,7 @@ trait EnumerableTest
         $reduced = $enumerable->reduceOption($binaryFunction);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($expected, $reduced);
+        self::assertEquals($expected, $reduced);
     }
 
     public function reduceOptionProvider()
@@ -878,7 +878,7 @@ trait EnumerableTest
         $reduced = $enumerable->reduceOption($binaryFunction, $initialValue);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($expected, $reduced);
+        self::assertEquals($expected, $reduced);
     }
 
     public function reduceOptionInjectProvider()
@@ -917,7 +917,7 @@ trait EnumerableTest
         $joined = $enumerable->join($separator);
 
         // then
-        PHPUnit_Framework_TestCase::assertEquals($joined, $expected);
+        self::assertEquals($joined, $expected);
     }
 
     public function joinProvider()
@@ -963,8 +963,8 @@ trait EnumerableTest
         $keys = $enumerable->keys();
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $keys);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($keys));
+        self::assertInstanceOf(Enumerable::class, $keys);
+        self::assertEquals($expected, iterator_to_array($keys));
     }
 
     public function keysProvider()
@@ -990,11 +990,11 @@ trait EnumerableTest
         $enumerable = $builder->build();
 
         // when
-        $keys = $enumerable->values();
+        $values = $enumerable->values();
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $keys);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($keys));
+        self::assertInstanceOf(Enumerable::class, $values);
+        self::assertEquals($expected, iterator_to_array($values));
     }
 
     public function valuesProvider()
@@ -1020,11 +1020,11 @@ trait EnumerableTest
         $enumerable = $builder->build();
 
         // when
-        $keys = $enumerable->entries();
+        $entries = $enumerable->entries();
 
         // then
-        PHPUnit_Framework_TestCase::assertInstanceOf(Enumerable::class, $keys);
-        PHPUnit_Framework_TestCase::assertEquals($expected, iterator_to_array($keys));
+        self::assertInstanceOf(Enumerable::class, $entries);
+        self::assertEquals($expected, iterator_to_array($entries));
     }
 
     public function entriesProvider()
@@ -1033,6 +1033,70 @@ trait EnumerableTest
             [["a", "b", "c"], [[0, "a"], [1, "b"], [2, "c"]]],
             [["a" => 1, "b" => 2, "c" => 3], [["a", 1], ["b", 2], ["c", 3]]],
             [[], []]
+        ];
+    }
+
+    /**
+     * @covers ::sort
+     * @dataProvider sortProvider
+     * @param $array
+     * @param $callback
+     * @param $expected
+     */
+    public function testSort($array, $callback, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $sorted = $enumerable->sort($callback);
+
+        // then
+        self::assertInstanceOf(Enumerable::class, $sorted);
+        self::assertEquals($expected, iterator_to_array($sorted));
+    }
+
+    public function sortProvider()
+    {
+        return [
+            [["a" => 1, "c" => 2, "b" => 4, "d" => 3], null, ["a" => 1, "b" => 4, "c" => 2, "d" => 3]]
+        ];
+    }
+
+    /**
+     * @covers ::sortBy
+     * @dataProvider sortByProvider
+     * @param $array
+     * @param $callback
+     * @param $expected
+     */
+    public function testSortBy($array, $callback, $expected)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $sorted = $enumerable->sortBy($callback);
+
+        // then
+        self::assertInstanceOf(Enumerable::class, $sorted);
+        self::assertEquals($expected, iterator_to_array($sorted));
+    }
+
+    public function sortByProvider()
+    {
+        return [
+            [["a" => 1, "c" => 2, "b" => 4, "d" => 3], function ($value, $key) {
+                return $value;
+            }, ["a" => 1, "c" => 2, "d" => 3, "b" => 4]],
+            [["a" => 1, "c" => 2, "b" => 4, "d" => 3], function ($value, $key) {
+                return $key;
+            }, ["a" => 1, "b" => 4, "c" => 2, "d" => 3]],
+            [["aaa", "aa", "aaaa", "a"], 'strlen', [3 => "a", 1 => "aa", 0 => "aaa", 2 => "aaaa"]]
         ];
     }
 

@@ -3,7 +3,6 @@
 namespace Traver\Test\UnitTest\Enumerable;
 
 
-use PHPUnit_Framework_TestCase;
 use Traver\Enumerable\Builder;
 use Traver\Enumerable\EnumerableView;
 use Traver\Enumerable\FromArrayBuilder;
@@ -11,9 +10,8 @@ use Traver\Enumerable\FromArrayBuilder;
 /**
  * @coversDefaultClass \Traver\Enumerable\EnumerableView
  */
-class EnumerableViewTest extends PHPUnit_Framework_TestCase
+class EnumerableViewTest extends EnumerableTest
 {
-    use EnumerableTest;
 
     /**
      * @return \Traver\Enumerable\Builder

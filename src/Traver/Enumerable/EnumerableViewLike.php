@@ -115,9 +115,31 @@ trait EnumerableViewLike
     public function groupBy(callable $keyFunction)
     {
         $keyFunction = self::wrapCallback($keyFunction);
-        $arrayObjectEnumerable = new ArrayObjectEnumerable($this->toArray());
-        return $arrayObjectEnumerable->groupBy($keyFunction);
+        $mutableCopy = new ArrayObjectEnumerable($this->toArray());
+        $grouped = $mutableCopy->groupBy($keyFunction);
+        return \Traver\view($grouped->asTraversable());
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function sort(callable $compareFunction = null)
+    {
+        $mutableCopy = new ArrayObjectEnumerable($this->toArray());
+        $sorted = $mutableCopy->sort($compareFunction);
+        return \Traver\view($sorted->asTraversable());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sortBy(callable $mappingFunction)
+    {
+        $mutableCopy = new ArrayObjectEnumerable($this->toArray());
+        $sorted = $mutableCopy->sortBy($mappingFunction);
+        return \Traver\view($sorted->asTraversable());
+    }
+
 
     /**
      * @return Iterator

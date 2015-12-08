@@ -198,6 +198,23 @@ interface Enumerable extends \Traversable, \Countable
     public function isEmpty();
 
     /**
+     * Creates a new enumerable containing all items in this enumerable sorted, either according to their natural order,
+     * or by using the results of the supplied compareFunction.
+     * @param callable $compareFunction
+     * @return Enumerable
+     */
+    public function sort(callable $compareFunction = null);
+
+    /**
+     * Creates a new enumerable containing all items in this enumerable sorted by the result of the mappingFunction.
+     * <p>This implementation first applies the mapping function to each entry, than sorts a temporary enumerable by the computed keys.
+     * From this enumerable a new enumerable it created by extracting the entries at the resulting index.</p>
+     * @param callable $mappingFunction
+     * @return Enumerable
+     */
+    public function sortBy(callable $mappingFunction);
+
+    /**
      * Transforms this enumerable into an array.
      * @param bool $preserveKeys indicates if the keys should be preserved or if values should be re-indexed.
      * @return array

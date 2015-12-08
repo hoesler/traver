@@ -20,9 +20,22 @@ use Traversable;
 trait EnumerableLike
 {
     /**
+     * @return \Closure
+     */
+    private static function naturalComparator()
+    {
+        return function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+            return ($a < $b) ? -1 : 1;
+        };
+    }
+
+    /**
      * Implements {@link Enumerable::map}.
      * @param callable $mappingFunction
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function map(callable $mappingFunction)
     {
@@ -36,7 +49,7 @@ trait EnumerableLike
 
     /**
      * @param callable $transformationFunction
-     * @return Enumerable
+     * @return EnumerableLike
      * @codeCoverageIgnore
      * @internal
      */
@@ -72,7 +85,7 @@ trait EnumerableLike
 
     /**
      * Implements {@link Enumerable::tail}.
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function tail()
     {
@@ -123,13 +136,13 @@ trait EnumerableLike
     public function countWhich(callable $predicate)
     {
         $predicate = self::wrapCallback($predicate);
-        return iterator_count($this->select($predicate));
+        return iterator_count($this->select($predicate)->asTraversable());
     }
 
     /**
      * Implements {@link Enumerable::drop}.
      * @param $n
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function drop($n)
     {
@@ -140,7 +153,7 @@ trait EnumerableLike
      * Implements {@link Enumerable::slice}.
      * @param int $from
      * @param int $until
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function slice($from, $until)
     {
@@ -163,7 +176,7 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::dropWhile}.
      * @param callable $predicate
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function dropWhile(callable $predicate)
     {
@@ -184,7 +197,7 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::take}.
      * @param int $n
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function take($n)
     {
@@ -194,7 +207,7 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::takeWhile}.
      * @param callable $predicate
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function takeWhile(callable $predicate)
     {
@@ -212,7 +225,7 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::select}.
      * @param callable $predicate
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function select(callable $predicate)
     {
@@ -230,7 +243,7 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::reject}.
      * @param callable $predicate
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function reject(callable $predicate)
     {
@@ -265,7 +278,7 @@ trait EnumerableLike
     /**
      * Implements {@link Enumerable::flatMap}.
      * @param callable $mappingFunction
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function flatMap(callable $mappingFunction)
     {
@@ -316,7 +329,7 @@ trait EnumerableLike
 
     /**
      * @param callable $keyFunction
-     * @return Enumerable
+     * @return EnumerableLike
      * @see Enumerable::groupBy
      */
     public function groupBy(callable $keyFunction)
@@ -401,7 +414,7 @@ trait EnumerableLike
 
     /**
      * Implements {@link Enumerable::keys}.
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function keys()
     {
@@ -413,7 +426,7 @@ trait EnumerableLike
 
     /**
      * Implements {@link Enumerable::values}.
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function values()
     {
@@ -425,7 +438,7 @@ trait EnumerableLike
 
     /**
      * Implements {@link Enumerable::entries}.
-     * @return Enumerable
+     * @return EnumerableLike
      */
     public function entries()
     {
@@ -445,6 +458,48 @@ trait EnumerableLike
         foreach ($this->asTraversable() as $key => $value) {
             $f($value, $key);
         }
+    }
+
+    /**
+     * Implements {@link Enumerable::sort}.
+     * @param callable|null $compareFunction
+     * @return EnumerableLike
+     */
+    public function sort(callable $compareFunction = null)
+    {
+        if ($compareFunction === null) {
+            $compareFunction = self::naturalComparator();
+        }
+        $sortedEntries = $this->entries()->toArray();
+        $success = uasort($sortedEntries, $compareFunction);
+        if ($success === false) {
+            throw new \RuntimeException("sort failed");
+        }
+        $builder = $this->builder();
+        foreach ($sortedEntries as $entry) {
+            list($key, $value) = $entry;
+            $builder->add($value, $key);
+        }
+        return $builder->build();
+    }
+
+    /**
+     * Implements {@link Enumerable::sortBy}.
+     * @param callable $mappingFunction
+     * @return EnumerableLike
+     */
+    public function sortBy(callable $mappingFunction)
+    {
+        $mappingFunction = self::wrapCallback($mappingFunction);
+        /** @noinspection PhpUnusedParameterInspection */
+        return $this
+            ->transform(function ($key, $value, $index) use ($mappingFunction) {
+                return [$index, [$mappingFunction($value, $key), [$key, $value]]];
+            })
+            ->sort($toSort)
+            ->transform(function ($key, $value, $index) {
+                return [$value[1][0], $value[1][1]];
+            });
     }
 
     /**

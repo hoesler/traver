@@ -4,7 +4,6 @@
 namespace Traver\Test\UnitTest\Enumerable;
 
 
-use PHPUnit_Framework_TestCase;
 use Traver\Enumerable\ArrayObjectEnumerable;
 
 /**
@@ -12,9 +11,8 @@ use Traver\Enumerable\ArrayObjectEnumerable;
  * @package Traver\Test\UnitTest\Enumerable
  * @coversDefaultClass \Traver\Enumerable\ArrayObjectEnumerable
  */
-class ArrayObjectEnumerableTest extends PHPUnit_Framework_TestCase
+class ArrayObjectEnumerableTest extends EnumerableTest
 {
-    use EnumerableTest;
 
     /**
      * @return \Traver\Enumerable\Builder
