@@ -4,8 +4,15 @@
 namespace Traver\Callback;
 
 
-class Callbacks
+final class Callbacks
 {
+    private function __construct()
+    {
+    }
+
+    private function __clone()
+    {
+    }
 
     /**
      * @param callable $f

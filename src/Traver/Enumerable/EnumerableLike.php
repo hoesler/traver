@@ -8,6 +8,7 @@ use PhpOption\None;
 use PhpOption\Option;
 use PhpOption\Some;
 use Traver\Callback\Callbacks;
+use Traver\Callback\Comparators;
 use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
 use Traversable;
@@ -19,19 +20,6 @@ use Traversable;
  */
 trait EnumerableLike
 {
-    /**
-     * @return \Closure
-     */
-    private static function naturalComparator()
-    {
-        return function ($a, $b) {
-            if ($a == $b) {
-                return 0;
-            }
-            return ($a < $b) ? -1 : 1;
-        };
-    }
-
     /**
      * Implements {@link Enumerable::map}.
      * @param callable $mappingFunction
@@ -468,7 +456,7 @@ trait EnumerableLike
     public function sort(callable $compareFunction = null)
     {
         if ($compareFunction === null) {
-            $compareFunction = self::naturalComparator();
+            $compareFunction = Comparators::naturalComparator();
         }
         $sortedEntries = $this->entries()->toArray();
         $success = uasort($sortedEntries, $compareFunction);
