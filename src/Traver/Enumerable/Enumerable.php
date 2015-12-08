@@ -200,8 +200,12 @@ interface Enumerable extends \Traversable, \Countable
     /**
      * Creates a new enumerable containing all items in this enumerable sorted, either according to their natural order,
      * or by using the results of the supplied compareFunction.
-     * @param callable $compareFunction
+     * @param callable $compareFunction A function accepting two [key, value] pairs returning an integer less than,
+     * equal to, or greater than zero if the first argument is considered to be respectively less than, equal to,
+     * or greater than the second.
      * @return Enumerable
+     * @see usort
+     * @see sortBy
      */
     public function sort(callable $compareFunction = null);
 
@@ -211,6 +215,7 @@ interface Enumerable extends \Traversable, \Countable
      * From this enumerable a new enumerable it created by extracting the entries at the resulting index.</p>
      * @param callable $mappingFunction
      * @return Enumerable
+     * @see sort
      */
     public function sortBy(callable $mappingFunction);
 
