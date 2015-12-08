@@ -153,11 +153,13 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers ::isEmpty
+     * @dataProvider emptyProvider
+     * @param $array
+     * @param $expected
      */
-    public function testIsEmptyTrue()
+    public function testIsEmpty($array, $expected)
     {
         // given
-        $array = [];
         $builder = $this->createBuilder();
         $builder->addAll($array);
         $enumerable = $builder->build();
@@ -166,25 +168,15 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
         $isEmpty = $enumerable->isEmpty();
 
         // then
-        self::assertTrue($isEmpty);
+        self::assertEquals($expected, $isEmpty);
     }
 
-    /**
-     * @covers ::isEmpty
-     */
-    public function testIsEmptyFalse()
+    public function emptyProvider()
     {
-        // given
-        $array = ["a"];
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-
-        // when
-        $isEmpty = $enumerable->isEmpty();
-
-        // then
-        self::assertFalse($isEmpty);
+        return [
+            [[], true],
+            [["a"], false]
+        ];
     }
 
     /**
@@ -267,21 +259,33 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider toArrayProvider
      * @covers ::toArray
+     * @param $array
+     * @param $expected
+     * @param $args
      */
-    public function testToArray()
+    public function testToArray($array, $expected, ...$args)
     {
         // given
-        $array = ["a", "b", "foo" => "c"];
         $builder = $this->createBuilder();
         $builder->addAll($array);
         $enumerable = $builder->build();
 
         // when
-        $toArray = $enumerable->toArray(true);
+        $toArray = $enumerable->toArray(...$args);
 
         // then
-        self::assertEquals($array, $toArray);
+        self::assertEquals($expected, $toArray);
+    }
+
+    public function toArrayProvider()
+    {
+        return [
+            [["a", "b", "foo" => "c"], ["a", "b", "foo" => "c"]],
+            [["a", "b", "foo" => "c"], ["a", "b", "foo" => "c"], true],
+            [["a", "b", "foo" => "c"], ["a", "b", "c"], false]
+        ];
     }
 
     /**
@@ -491,31 +495,6 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
             return !$predicate($value, $key);
         }, ARRAY_FILTER_USE_BOTH);
         self::assertEquals($expected, $actual);
-    }
-
-    public function testMethodChaining()
-    {
-        // given
-        $array = ["a", "b", "c"];
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-        $predicate = function ($el) {
-            return $el != "b";
-        };
-        $mappingFunction = function ($item) {
-            return $item . "_";
-        };
-
-        // when
-        $head = $enumerable
-            ->select($predicate)
-            ->drop(1)
-            ->map($mappingFunction)
-            ->head();
-
-        // then
-        self::assertEquals('c_', $head);
     }
 
     /**
@@ -737,10 +716,10 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
      * @covers ::reduce
      * @dataProvider reduceProvider
      * @param array $array
-     * @param $binaryFunction
+     * @param $args
      * @param $expected
      */
-    public function testReduce(array $array, $binaryFunction, $expected)
+    public function testReduce(array $array, $expected, ...$args)
     {
         // given
         $builder = $this->createBuilder();
@@ -748,7 +727,7 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
         $enumerable = $builder->build();
 
         // when
-        $reduced = $enumerable->reduce($binaryFunction);
+        $reduced = $enumerable->reduce(...$args);
 
         // then
         self::assertEquals($expected, $reduced);
@@ -757,13 +736,25 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
     public function reduceProvider()
     {
         return [
-            [[10, 5, 1], function ($a, $b) {
+            [[10, 5, 1], 16, function ($a, $b) {
                 return $a + $b;
-            }, 16],
-            [["a", "b", "foo" => "c"], function ($a, $b) {
+            }],
+            [["a", "b", "foo" => "c"], "abc", function ($a, $b) {
                 return $a . $b;
-            }, "abc"],
-            [[1, 2, 3], array(OperatorCallbacks::class, 'add'), 6]
+            }],
+            [[1, 2, 3], 6, array(OperatorCallbacks::class, 'add')],
+            [[10, 5, 1], 18, function ($a, $b) {
+                return $a + $b;
+            }, 2],
+            [["a", "b", "foo" => "c"], "_abc", function ($a, $b) {
+                return $a . $b;
+            }, "_"],
+            [[], "_", function ($a, $b) {
+                return $a . $b;
+            }, "_"],
+            [[], null, function ($a, $b) {
+                return $a . $b;
+            }, null]
         ];
     }
 
@@ -786,53 +777,13 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::reduce
-     * @dataProvider reduceInjectProvider
-     * @param array $array
-     * @param $initialValue
-     * @param $binaryFunction
-     * @param $expected
-     */
-    public function testReduceInject(array $array, $initialValue, $binaryFunction, $expected)
-    {
-        // given
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-
-        // when
-        $reduced = $enumerable->reduce($binaryFunction, $initialValue);
-
-        // then
-        self::assertEquals($expected, $reduced);
-    }
-
-    public function reduceInjectProvider()
-    {
-        return [
-            [[10, 5, 1], 2, function ($a, $b) {
-                return $a + $b;
-            }, 18],
-            [["a", "b", "foo" => "c"], "_", function ($a, $b) {
-                return $a . $b;
-            }, "_abc"],
-            [[], "_", function ($a, $b) {
-                return $a . $b;
-            }, "_"],
-            [[], null, function ($a, $b) {
-                return $a . $b;
-            }, null]
-        ];
-    }
-
-    /**
      * @covers ::reduceOption
      * @dataProvider reduceOptionProvider
      * @param array $array
-     * @param $binaryFunction
      * @param $expected
+     * @param $args
      */
-    public function testReduceOption(array $array, $binaryFunction, $expected)
+    public function testReduceOption(array $array, $expected, ...$args)
     {
         // given
         $builder = $this->createBuilder();
@@ -840,7 +791,7 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
         $enumerable = $builder->build();
 
         // when
-        $reduced = $enumerable->reduceOption($binaryFunction);
+        $reduced = $enumerable->reduceOption(...$args);
 
         // then
         self::assertEquals($expected, $reduced);
@@ -849,55 +800,27 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
     public function reduceOptionProvider()
     {
         return [
-            [[10, 5, 1], function ($a, $b) {
+            [[10, 5, 1], Some::create(16), function ($a, $b) {
                 return $a + $b;
-            }, Some::create(16)],
-            [["a", "b", "foo" => "c"], function ($a, $b) {
+            }],
+            [["a", "b", "foo" => "c"], Some::create("abc"), function ($a, $b) {
                 return $a . $b;
-            }, Some::create("abc")],
-            [[], function ($a, $b) {
+            }],
+            [[], None::create(), function ($a, $b) {
                 return $a . $b;
-            }, None::create()]
-        ];
-    }
-
-    /**
-     * @covers ::reduceOption
-     * @dataProvider reduceOptionInjectProvider
-     * @param array $array
-     * @param $initialValue
-     * @param $binaryFunction
-     * @param $expected
-     */
-    public function testReduceOptionInject(array $array, $initialValue, $binaryFunction, $expected)
-    {
-        // given
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-
-        // when
-        $reduced = $enumerable->reduceOption($binaryFunction, $initialValue);
-
-        // then
-        self::assertEquals($expected, $reduced);
-    }
-
-    public function reduceOptionInjectProvider()
-    {
-        return [
-            [[10, 5, 1], 2, function ($a, $b) {
+            }],
+            [[10, 5, 1], Some::create(18), function ($a, $b) {
                 return $a + $b;
-            }, Some::create(18)],
-            [["a", "b", "foo" => "c"], "_", function ($a, $b) {
+            }, 2],
+            [["a", "b", "foo" => "c"], Some::create("_abc"), function ($a, $b) {
                 return $a . $b;
-            }, Some::create("_abc")],
-            [[], "_", function ($a, $b) {
+            }, "_"],
+            [[], Some::create("_"), function ($a, $b) {
                 return $a . $b;
-            }, Some::create("_")],
-            [[], null, function ($a, $b) {
+            }, "_"],
+            [[], Some::create(null), function ($a, $b) {
                 return $a . $b;
-            }, Some::create(null)]
+            }, null]
         ];
     }
 
@@ -905,10 +828,10 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
      * @covers ::join
      * @dataProvider joinProvider
      * @param array $array
-     * @param $separator
      * @param $expected
+     * @param $args
      */
-    public function testJoin($array, $separator, $expected)
+    public function testJoin($array, $expected, ...$args)
     {
         // given
         $builder = $this->createBuilder();
@@ -916,7 +839,7 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
         $enumerable = $builder->build();
 
         // when
-        $joined = $enumerable->join($separator);
+        $joined = $enumerable->join(...$args);
 
         // then
         self::assertEquals($joined, $expected);
@@ -927,23 +850,26 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
         return [
             [
                 ["a", "b", "c"],
-                null,
                 "abc"
             ],
             [
                 [],
-                null,
-                ""
+                ''
+            ],
+            [
+                [],
+                '',
+                '-'
             ],
             [
                 ["a", "b", "c"],
-                "-",
-                "a-b-c"
+                "a-b-c",
+                "-"
             ],
             [
                 [1, 2, 10, 12],
-                ",",
-                "1,2,10,12"
+                "1,2,10,12",
+                ","
             ]
         ];
     }
@@ -1042,10 +968,10 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
      * @covers ::sort
      * @dataProvider sortProvider
      * @param $array
-     * @param $callback
      * @param $expected
+     * @param $args
      */
-    public function testSort($array, $callback, $expected)
+    public function testSort($array, $expected, ...$args)
     {
         // given
         $builder = $this->createBuilder();
@@ -1053,7 +979,7 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
         $enumerable = $builder->build();
 
         // when
-        $sorted = $enumerable->sort($callback);
+        $sorted = $enumerable->sort(...$args);
 
         // then
         self::assertInstanceOf(Enumerable::class, $sorted);
@@ -1065,20 +991,19 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
         return [
             [
                 ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
-                null,
                 ["a" => 1, "b" => 4, "c" => 2, "d" => 3]
             ],
             [
                 ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
-                Comparators::naturalComparator(),
-                ["a" => 1, "b" => 4, "c" => 2, "d" => 3]
+                ["a" => 1, "b" => 4, "c" => 2, "d" => 3],
+                Comparators::naturalComparator()
             ],
             [
+                ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
                 ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
                 function () {
                     return 0;
-                },
-                ["a" => 1, "c" => 2, "b" => 4, "d" => 3]
+                }
             ]
         ];
     }
