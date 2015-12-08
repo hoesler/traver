@@ -7,6 +7,7 @@ namespace Traver\Test\UnitTest\Enumerable;
 use PhpOption\None;
 use PhpOption\Some;
 use PHPUnit_Framework_TestCase;
+use Traver\Callback\Comparators;
 use Traver\Callback\OperatorCallbacks;
 use Traver\Enumerable\Enumerable;
 use Traversable;
@@ -424,7 +425,7 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
             [[10, 5, 1], function ($value) {
                 return $value <= 5;
             }, []],
-            [[], function ($value) {
+            [[], function () {
                 return true;
             }, []]
         ];
@@ -454,6 +455,7 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
 
     public function selectProvider()
     {
+        /** @noinspection PhpUnusedParameterInspection */
         return [
             [["a", "b", "c"], function ($value) {
                 return $value != "b";
@@ -1061,7 +1063,23 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
     public function sortProvider()
     {
         return [
-            [["a" => 1, "c" => 2, "b" => 4, "d" => 3], null, ["a" => 1, "b" => 4, "c" => 2, "d" => 3]]
+            [
+                ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
+                null,
+                ["a" => 1, "b" => 4, "c" => 2, "d" => 3]
+            ],
+            [
+                ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
+                Comparators::naturalComparator(),
+                ["a" => 1, "b" => 4, "c" => 2, "d" => 3]
+            ],
+            [
+                ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
+                function () {
+                    return 0;
+                },
+                ["a" => 1, "c" => 2, "b" => 4, "d" => 3]
+            ]
         ];
     }
 
@@ -1089,14 +1107,27 @@ abstract class EnumerableTest extends PHPUnit_Framework_TestCase
 
     public function sortByProvider()
     {
+        /** @noinspection PhpUnusedParameterInspection */
         return [
-            [["a" => 1, "c" => 2, "b" => 4, "d" => 3], function ($value, $key) {
-                return $value;
-            }, ["a" => 1, "c" => 2, "d" => 3, "b" => 4]],
-            [["a" => 1, "c" => 2, "b" => 4, "d" => 3], function ($value, $key) {
-                return $key;
-            }, ["a" => 1, "b" => 4, "c" => 2, "d" => 3]],
-            [["aaa", "aa", "aaaa", "a"], 'strlen', [3 => "a", 1 => "aa", 0 => "aaa", 2 => "aaaa"]]
+            [
+                ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
+                function ($value) {
+                    return $value;
+                },
+                ["a" => 1, "c" => 2, "d" => 3, "b" => 4]
+            ],
+            [
+                ["a" => 1, "c" => 2, "b" => 4, "d" => 3],
+                function ($value, $key) {
+                    return $key;
+                },
+                ["a" => 1, "b" => 4, "c" => 2, "d" => 3]
+            ],
+            [
+                ["aaa", "aa", "aaaa", "a"],
+                'strlen',
+                [3 => "a", 1 => "aa", 0 => "aaa", 2 => "aaaa"]
+            ]
         ];
     }
 
