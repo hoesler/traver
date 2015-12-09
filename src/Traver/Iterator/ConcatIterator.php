@@ -40,6 +40,14 @@ final class ConcatIterator implements \OuterIterator
         return $this->current->current();
     }
 
+    private function findNextIterator()
+    {
+        while (!$this->current->valid() && $this->iterator->valid()) {
+            $this->current = $this->iterator->current();
+            $this->iterator->next();
+        }
+    }
+
     public function valid()
     {
         if (!$this->current->valid()) {
@@ -60,14 +68,6 @@ final class ConcatIterator implements \OuterIterator
     public function key()
     {
         return $this->key;
-    }
-
-    private function findNextIterator()
-    {
-        while (!$this->current->valid() && $this->iterator->valid()) {
-            $this->current = $this->iterator->current();
-            $this->iterator->next();
-        }
     }
 
     /**

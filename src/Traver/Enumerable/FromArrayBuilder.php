@@ -14,6 +14,19 @@ trait FromArrayBuilder
     private $array = [];
 
     /**
+     * @param array|Traversable $array
+     * @param bool $preserveKeys
+     * @return Builder
+     */
+    public function addAll($array, $preserveKeys = true)
+    {
+        foreach ($array as $key => $value) {
+            $this->add($value, ($preserveKeys) ? $key : null);
+        }
+        return $this;
+    }
+
+    /**
      * @param mixed $element
      * @param mixed $key
      * @return Builder
@@ -24,19 +37,6 @@ trait FromArrayBuilder
             $this->array[] = $element;
         } else {
             $this->array[$key] = $element;
-        }
-        return $this;
-    }
-
-    /**
-     * @param array|Traversable $array
-     * @param bool $preserveKeys
-     * @return Builder
-     */
-    public function addAll($array, $preserveKeys = true)
-    {
-        foreach ($array as $key => $value) {
-            $this->add($value, ($preserveKeys) ? $key : null);
         }
         return $this;
     }

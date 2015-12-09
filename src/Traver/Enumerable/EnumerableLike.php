@@ -21,39 +21,6 @@ use Traversable;
 trait EnumerableLike
 {
     /**
-     * Implements {@link Enumerable::map}.
-     * @param callable $mappingFunction
-     * @return EnumerableLike
-     */
-    public function map(callable $mappingFunction)
-    {
-        $mappingFunction = self::wrapCallback($mappingFunction);
-        $builder = $this->builder();
-        foreach ($this->asTraversable() as $key => $value) {
-            $builder->add($mappingFunction($value, $key), $key);
-        }
-        return $builder->build();
-    }
-
-    /**
-     * @param callable $transformationFunction
-     * @return EnumerableLike
-     * @codeCoverageIgnore
-     * @internal
-     */
-    private function transform(callable $transformationFunction)
-    {
-        $builder = $this->builder();
-        $index = 0;
-        foreach ($this->asTraversable() as $key => $value) {
-            list($newKey, $newValue) = $transformationFunction($key, $value, $index);
-            $builder->add($newValue, $newKey);
-            $index++;
-        }
-        return $builder->build();
-    }
-
-    /**
      * Implements {@link Enumerable::head}.
      * @return mixed
      */
@@ -70,6 +37,12 @@ trait EnumerableLike
         }
         return $result();
     }
+
+    /**
+     * Implements {@link Enumerable::asTraversable}.
+     * @return Traversable
+     */
+    abstract public function asTraversable();
 
     /**
      * Implements {@link Enumerable::tail}.
@@ -95,36 +68,6 @@ trait EnumerableLike
             $result = false;
         }
         return $result;
-    }
-
-    /**
-     * Implements {@link Enumerable::toArray}.
-     * @param bool $preserveKeys
-     * @return array
-     */
-    public function toArray($preserveKeys = true)
-    {
-        return iterator_to_array($this->asTraversable(), $preserveKeys);
-    }
-
-    /**
-     * Implements {@link Enumerable::count}.
-     * @return int
-     */
-    public function count()
-    {
-        return iterator_count($this->asTraversable());
-    }
-
-    /**
-     * Implements {@link Enumerable::countWhich}.
-     * @param callable $predicate
-     * @return int
-     */
-    public function countWhich(callable $predicate)
-    {
-        $predicate = self::wrapCallback($predicate);
-        return iterator_count($this->select($predicate)->asTraversable());
     }
 
     /**
@@ -156,6 +99,75 @@ trait EnumerableLike
                 if ($i >= $until) {
                     break;
                 }
+            }
+        }
+        return $builder->build();
+    }
+
+    /**
+     * Creates a new Builder for the current class implementing Enumerable.
+     * @return Builder
+     */
+    abstract protected function builder();
+
+    /**
+     * Implements {@link Enumerable::count}.
+     * @return int
+     */
+    public function count()
+    {
+        return iterator_count($this->asTraversable());
+    }
+
+    /**
+     * Implements {@link Enumerable::countWhich}.
+     * @param callable $predicate
+     * @return int
+     */
+    public function countWhich(callable $predicate)
+    {
+        $predicate = self::wrapCallback($predicate);
+        return iterator_count($this->select($predicate)->asTraversable());
+    }
+
+    /**
+     * Wraps the given callback in a callback which has two arguments (value, key),
+     * if the given callback accepts only one argument (assumed as value).
+     * Allows for callbacks which expect exactly one argument like {@link ucfirst} or {@link is_string},
+     * @param callable $callback
+     * @return \Closure
+     */
+    protected static function wrapCallback(callable $callback)
+    {
+        $reflection = Callbacks::createReflectionFunction($callback);
+        $numberOfParameters = $reflection->getNumberOfParameters();
+
+        $proxy = $callback;
+
+        if ($numberOfParameters == 1) {
+            /** @noinspection PhpUnusedParameterInspection */
+            /** @noinspection PhpDocSignatureInspection */
+            $proxy = function ($value, $key) use ($callback) {
+                return $callback($value);
+            };
+        }
+
+        return $proxy;
+    }
+
+    /**
+     * Implements {@link Enumerable::select}.
+     * @param callable $predicate
+     * @return EnumerableLike
+     */
+    public function select(callable $predicate)
+    {
+        $predicate = self::wrapCallback($predicate);
+        $builder = $this->builder();
+        foreach ($this->asTraversable() as $key => $value) {
+            $accepted = $predicate($value, $key);
+            if ($accepted) {
+                $builder->add($value, $key);
             }
         }
         return $builder->build();
@@ -206,24 +218,6 @@ trait EnumerableLike
                 break;
             }
             $builder->add($value, $key);
-        }
-        return $builder->build();
-    }
-
-    /**
-     * Implements {@link Enumerable::select}.
-     * @param callable $predicate
-     * @return EnumerableLike
-     */
-    public function select(callable $predicate)
-    {
-        $predicate = self::wrapCallback($predicate);
-        $builder = $this->builder();
-        foreach ($this->asTraversable() as $key => $value) {
-            $accepted = $predicate($value, $key);
-            if ($accepted) {
-                $builder->add($value, $key);
-            }
         }
         return $builder->build();
     }
@@ -334,10 +328,19 @@ trait EnumerableLike
 
         $builder = ImmutableMap::newBuilder();
         foreach ($result as $key => $group) {
-            $groupEnumerable = $this->builder()->addAll($group)->build();
+            $groupEnumerable = $this->newCollection($group);
             $builder->add($groupEnumerable, $key);
         }
         return $builder->build();
+    }
+
+    /**
+     * @param $array |Traversable
+     * @return Enumerable
+     */
+    protected final function newCollection($array)
+    {
+        return $this->builder()->addAll($array)->build();
     }
 
     /**
@@ -351,6 +354,25 @@ trait EnumerableLike
         return $this->reduceOption(function ($joined, $item) use ($separator) {
             return $joined . $separator . $item;
         })->getOrElse('');
+    }
+
+    /**
+     * Implements {@link Enumerable::reduceOption}.
+     * @param callable $binaryFunction
+     * @param mixed $initial
+     * @return Option
+     */
+    public function reduceOption(callable $binaryFunction, $initial = null)
+    {
+        if (func_num_args() == 1) {
+            if ($this->isEmpty()) {
+                return None::create();
+            } else {
+                return Some::create($this->reduce($binaryFunction));
+            }
+        } else {
+            return Some::create($this->reduce($binaryFunction, $initial));
+        }
     }
 
     /**
@@ -382,25 +404,6 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::reduceOption}.
-     * @param callable $binaryFunction
-     * @param mixed $initial
-     * @return Option
-     */
-    public function reduceOption(callable $binaryFunction, $initial = null)
-    {
-        if (func_num_args() == 1) {
-            if ($this->isEmpty()) {
-                return None::create();
-            } else {
-                return Some::create($this->reduce($binaryFunction));
-            }
-        } else {
-            return Some::create($this->reduce($binaryFunction, $initial));
-        }
-    }
-
-    /**
      * Implements {@link Enumerable::keys}.
      * @return EnumerableLike
      */
@@ -410,6 +413,24 @@ trait EnumerableLike
         return $this->transform(function ($key, $value, $index) {
             return [$index, $key];
         });
+    }
+
+    /**
+     * @param callable $transformationFunction
+     * @return EnumerableLike
+     * @codeCoverageIgnore
+     * @internal
+     */
+    private function transform(callable $transformationFunction)
+    {
+        $builder = $this->builder();
+        $index = 0;
+        foreach ($this->asTraversable() as $key => $value) {
+            list($newKey, $newValue) = $transformationFunction($key, $value, $index);
+            $builder->add($newValue, $newKey);
+            $index++;
+        }
+        return $builder->build();
     }
 
     /**
@@ -449,28 +470,6 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::sort}.
-     * @param callable|null $compareFunction
-     * @return EnumerableLike
-     */
-    public function sort(callable $compareFunction = null)
-    {
-        if ($compareFunction === null) {
-            $compareFunction = Comparators::naturalComparator();
-        }
-        $array = $this->toArray();
-        $success = uasort($array, $compareFunction);
-        if ($success === false) {
-            throw new \RuntimeException("sort failed");
-        }
-        $builder = $this->builder();
-        foreach ($array as $key => $value) {
-            $builder->add($value, $key);
-        }
-        return $builder->build();
-    }
-
-    /**
      * Implements {@link Enumerable::sortBy}.
      * @param callable $mappingFunction
      * @return EnumerableLike
@@ -492,58 +491,65 @@ trait EnumerableLike
         return $builder->build();
     }
 
+    /**
+     * Implements {@link Enumerable::sort}.
+     * @param callable|null $compareFunction
+     * @return EnumerableLike
+     */
+    public function sort(callable $compareFunction = null)
+    {
+        if ($compareFunction === null) {
+            $compareFunction = Comparators::naturalComparator();
+        }
+        $array = $this->toArray();
+        $success = uasort($array, $compareFunction);
+        if ($success === false) {
+            throw new \RuntimeException("sort failed");
+        }
+
+        return $this->newCollection($array);
+    }
+
+    /**
+     * Implements {@link Enumerable::toArray}.
+     * @param bool $preserveKeys
+     * @return array
+     */
+    public function toArray($preserveKeys = true)
+    {
+        return iterator_to_array($this->asTraversable(), $preserveKeys);
+    }
+
+    /**
+     * Implements {@link Enumerable::map}.
+     * @param callable $mappingFunction
+     * @return EnumerableLike
+     */
+    public function map(callable $mappingFunction)
+    {
+        $mappingFunction = self::wrapCallback($mappingFunction);
+        $builder = $this->builder();
+        foreach ($this->asTraversable() as $key => $value) {
+            $builder->add($mappingFunction($value, $key), $key);
+        }
+        return $builder->build();
+    }
 
     /**
      * @return Enumerable
      */
-    public function view()
+    protected final function mutableCopy()
     {
-        return \Traver\view($this->asTraversable());
-    }
-
-    /**
-     * Implements {@link Enumerable::asTraversable}.
-     * @return Traversable
-     */
-    abstract public function asTraversable();
-
-    /**
-     * Creates a new Builder for the current class implementing Enumerable.
-     * @return Builder
-     */
-    abstract protected function builder();
-
-    /**
-     * Wraps the given callback in a callback which has two arguments (value, key),
-     * if the given callback accepts only one argument (assumed as value).
-     * Allows for callbacks which expect exactly one argument like {@link ucfirst} or {@link is_string},
-     * @param callable $callback
-     * @return \Closure
-     */
-    protected static function wrapCallback(callable $callback)
-    {
-        $reflection = Callbacks::createReflectionFunction($callback);
-        $numberOfParameters = $reflection->getNumberOfParameters();
-
-        $proxy = $callback;
-
-        if ($numberOfParameters == 1) {
-            /** @noinspection PhpUnusedParameterInspection */
-            /** @noinspection PhpDocSignatureInspection */
-            $proxy = function ($value, $key) use ($callback) {
-                return $callback($value);
-            };
+        if ($this->isVectorLike()) {
+            return new MutableVector($this->toArray());
+        } else {
+            return new MutableMap($this->toArray());
         }
-
-        return $proxy;
     }
 
     /**
      * Tests if the collection is vector like. The result is used to control preservation of keys.
      * @return mixed
      */
-    public function isVectorLike()
-    {
-        return false;
-    }
+    public abstract function isVectorLike();
 }

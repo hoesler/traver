@@ -154,7 +154,7 @@ interface Enumerable extends \Traversable, \Countable
      * @return Option
      */
     public function reduceOption(callable $binaryFunction, $initial = null);
-    
+
     /**
      * Selects the elements in the interval [from, until).
      * @param int $from

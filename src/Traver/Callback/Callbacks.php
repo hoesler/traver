@@ -10,10 +10,6 @@ final class Callbacks
     {
     }
 
-    private function __clone()
-    {
-    }
-
     /**
      * @param callable $f
      * @return \ReflectionFunction|\ReflectionMethod
@@ -33,5 +29,9 @@ final class Callbacks
             $reflection = new \ReflectionFunction($f);
             return $reflection;
         }
+    }
+
+    private function __clone()
+    {
     }
 }

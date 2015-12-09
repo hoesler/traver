@@ -32,6 +32,11 @@ class ImmutableVector implements \IteratorAggregate, Collection
         $this->delegate = $delegate;
     }
 
+    public static function fromArray($array, $save_indexes = true)
+    {
+        return new self(\SplFixedArray::fromArray($array, $save_indexes));
+    }
+
     function __clone()
     {
     }
@@ -50,11 +55,6 @@ class ImmutableVector implements \IteratorAggregate, Collection
     function delegate()
     {
         return $this->delegate;
-    }
-
-    public static function fromArray($array, $save_indexes = true)
-    {
-        return new self(\SplFixedArray::fromArray($array, $save_indexes));
     }
 
     public function builder()

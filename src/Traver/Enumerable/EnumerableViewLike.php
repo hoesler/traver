@@ -105,8 +105,8 @@ trait EnumerableViewLike
         $mutableCopy = $this->mutableCopy();
         $grouped = $mutableCopy->groupBy($keyFunction);
 
-        return $grouped->map(function ($value) {
-            return $this->builder()->addAll($value)->build();
+        return $grouped->map(function ($group) {
+            return $this->newCollection($group);
         });
     }
 
@@ -115,9 +115,7 @@ trait EnumerableViewLike
         $mutableCopy = $this->mutableCopy();
         $sorted = $mutableCopy->sort($compareFunction);
 
-        $builder = $this->builder();
-        $builder->addAll($sorted->asTraversable());
-        return $builder->build();
+        return $this->newCollection($sorted->asTraversable());
     }
 
     public function sortBy(callable $mappingFunction)
@@ -125,15 +123,8 @@ trait EnumerableViewLike
         $mutableCopy = $this->mutableCopy();
         $sorted = $mutableCopy->sortBy($mappingFunction);
 
-        $builder = $this->builder();
-        $builder->addAll($sorted->asTraversable());
-        return $builder->build();
+        return $this->newCollection($sorted->asTraversable());
     }
-
-    /**
-     * @return Iterator
-     */
-    abstract function getIterator();
 
     final public function asTraversable()
     {
@@ -141,14 +132,7 @@ trait EnumerableViewLike
     }
 
     /**
-     * @return Enumerable
+     * @return Iterator
      */
-    private function mutableCopy()
-    {
-        if ($this->isVectorLike()) {
-            return new MutableVector($this->toArray());
-        } else {
-            return new MutableMap($this->toArray());
-        }
-    }
+    abstract function getIterator();
 }

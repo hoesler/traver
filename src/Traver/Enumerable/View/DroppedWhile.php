@@ -21,6 +21,10 @@ class DroppedWhile implements \IteratorAggregate, Enumerable
      * @var callable
      */
     private $predicate;
+
+    /**
+     * @var EnumerableViewLike
+     */
     private $delegate;
 
     /**

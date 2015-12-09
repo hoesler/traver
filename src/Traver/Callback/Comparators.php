@@ -10,11 +10,6 @@ final class Comparators
     {
     }
 
-    private function __clone()
-    {
-    }
-
-
     /**
      * @return \Closure
      */
@@ -26,5 +21,9 @@ final class Comparators
             }
             return ($a < $b) ? -1 : 1;
         };
+    }
+
+    private function __clone()
+    {
     }
 }

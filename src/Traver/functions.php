@@ -2,7 +2,6 @@
 
 namespace Traver;
 
-use ArrayObject;
 use Traver\Callback\OperatorCallbacks;
 use Traver\Enumerable\Enumerable;
 use Traver\Enumerable\ImmutableMap;
@@ -16,12 +15,12 @@ if (!function_exists('Traver\view')) {
      */
     function view($collection)
     {
-        if (is_a($collection, ImmutableMap::class) || is_a($collection, ImmutableVector::class)) {
-            return $collection;
-        } elseif (is_array($collection)) {
+        if (is_array($collection)) {
             return ImmutableMap::fromArray($collection);
+        } elseif (is_a($collection, ImmutableMap::class) || is_a($collection, ImmutableVector::class)) {
+            return $collection;
         } else {
-            return ImmutableMap::fromArray(new ArrayObject(iterator_to_array($collection)));
+            return ImmutableMap::fromArray(iterator_to_array($collection));
         }
     }
 }

@@ -8,6 +8,16 @@ trait EnumerableView
 {
     use EnumerableViewLike;
 
+    public function isVectorLike()
+    {
+        return $this->delegate()->isVectorLike();
+    }
+
+    /**
+     * @return EnumerableViewLike
+     */
+    protected abstract function delegate();
+
     /**
      * @codeCoverageIgnore
      */
@@ -15,9 +25,4 @@ trait EnumerableView
     {
         return $this->delegate()->builder();
     }
-
-    /**
-     * @return EnumerableViewLike
-     */
-    protected abstract function delegate();
 }

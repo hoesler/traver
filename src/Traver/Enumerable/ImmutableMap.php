@@ -27,6 +27,15 @@ class ImmutableMap implements \IteratorAggregate, Collection
     }
 
     /**
+     * @param array $array
+     * @return ImmutableMap
+     */
+    public static function fromArray(array $array)
+    {
+        return new self(new \ArrayObject($array));
+    }
+
+    /**
      * @inheritDoc
      */
     function __clone()
@@ -49,11 +58,6 @@ class ImmutableMap implements \IteratorAggregate, Collection
         return $this->delegate;
     }
 
-    public static function fromArray($array)
-    {
-        return new self(new \ArrayObject($array));
-    }
-
     public function builder()
     {
         return self::newBuilder();
@@ -62,6 +66,11 @@ class ImmutableMap implements \IteratorAggregate, Collection
     public static function newBuilder()
     {
         return new ImmutableMapBuilder();
+    }
+
+    public function isVectorLike()
+    {
+        return false;
     }
 }
 

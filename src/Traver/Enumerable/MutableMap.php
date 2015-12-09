@@ -41,17 +41,22 @@ class MutableMap implements \IteratorAggregate, Collection
     /**
      * @inheritDoc
      */
-    function delegate()
+    public function getIterator()
     {
-        return $this->delegate;
+        return $this->delegate()->getIterator();
     }
 
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    function delegate()
     {
-        return $this->delegate()->getIterator();
+        return $this->delegate;
+    }
+
+    public function isVectorLike()
+    {
+        return false;
     }
 }
 

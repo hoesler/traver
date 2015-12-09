@@ -7,17 +7,17 @@ namespace Traver\Enumerable;
 trait ForwardingArrayAccess
 {
     /**
-     * @return \ArrayAccess
-     */
-    abstract function delegate();
-
-    /**
      * @inheritDoc
      */
     public function offsetExists($offset)
     {
         return $this->delegate()->offsetExists($offset);
     }
+
+    /**
+     * @return \ArrayAccess
+     */
+    abstract function delegate();
 
     /**
      * @inheritDoc

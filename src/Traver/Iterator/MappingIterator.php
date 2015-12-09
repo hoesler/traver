@@ -44,18 +44,18 @@ class MappingIterator implements OuterIterator
     /**
      * @inheritDoc
      */
-    public function next()
+    public function key()
     {
-        $this->delegate->next();
-        $this->index++;
+        return $this->delegate->key();
     }
 
     /**
      * @inheritDoc
      */
-    public function key()
+    public function next()
     {
-        return $this->delegate->key();
+        $this->delegate->next();
+        $this->index++;
     }
 
     /**
