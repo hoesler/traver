@@ -36,11 +36,7 @@ trait FromArrayBuilder
     public function addAll($array, $preserveKeys = true)
     {
         foreach ($array as $key => $value) {
-            if ($preserveKeys) {
-                $this->add($value, $key);
-            } else {
-                array_push($this->array, $value);
-            }
+            $this->add($value, ($preserveKeys) ? $key : null);
         }
         return $this;
     }

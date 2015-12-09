@@ -4,22 +4,23 @@
 namespace Traver\Test\UnitTest\Enumerable;
 
 
-use Traver\Enumerable\ArrayObjectEnumerable;
+use Traver\Enumerable\MutableMap;
 
 /**
- * Class ArrayObjectEnumerableTest
+ * Class MutableMapTest
  * @package Traver\Test\UnitTest\Enumerable
- * @coversDefaultClass \Traver\Enumerable\ArrayObjectEnumerable
+ * @coversDefaultClass \Traver\Enumerable\MutableMap
  */
-class ArrayObjectEnumerableTest extends EnumerableTest
+class MutableMapTest extends AbstractMapTest
 {
+    use MutabilityTest;
 
     /**
      * @return \Traver\Enumerable\Builder
      */
     protected function createBuilder()
     {
-        $arrayObjectEnumerable = new ArrayObjectEnumerable();
+        $arrayObjectEnumerable = new MutableMap();
         return $arrayObjectEnumerable->builder();
     }
 }

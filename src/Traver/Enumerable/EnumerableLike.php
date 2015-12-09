@@ -332,12 +332,12 @@ trait EnumerableLike
             $result[$groupKey][$key] = $value;
         }
 
-        $map = new ArrayObjectEnumerable();
+        $builder = ImmutableMap::newBuilder();
         foreach ($result as $key => $group) {
             $groupEnumerable = $this->builder()->addAll($group)->build();
-            $map[$key] = $groupEnumerable;
+            $builder->add($groupEnumerable, $key);
         }
-        return $map;
+        return $builder->build();
     }
 
     /**
@@ -458,14 +458,13 @@ trait EnumerableLike
         if ($compareFunction === null) {
             $compareFunction = Comparators::naturalComparator();
         }
-        $sortedEntries = $this->entries()->toArray();
-        $success = uasort($sortedEntries, $compareFunction);
+        $array = $this->toArray();
+        $success = uasort($array, $compareFunction);
         if ($success === false) {
             throw new \RuntimeException("sort failed");
         }
         $builder = $this->builder();
-        foreach ($sortedEntries as $entry) {
-            list($key, $value) = $entry;
+        foreach ($array as $key => $value) {
             $builder->add($value, $key);
         }
         return $builder->build();
@@ -479,15 +478,27 @@ trait EnumerableLike
     public function sortBy(callable $mappingFunction)
     {
         $mappingFunction = self::wrapCallback($mappingFunction);
-        /** @noinspection PhpUnusedParameterInspection */
-        return $this
-            ->transform(function ($key, $value, $index) use ($mappingFunction) {
-                return [$index, [$mappingFunction($value, $key), [$key, $value]]];
+        $sortedKeyEntryPairs = $this
+            ->map(function ($value, $key) use ($mappingFunction) {
+                return [$mappingFunction($value, $key), [$key, $value]];
             })
-            ->sort($toSort)
-            ->transform(function ($key, $value, $index) {
-                return [$value[1][0], $value[1][1]];
-            });
+            ->sort();
+
+        $builder = $this->builder();
+        foreach ($sortedKeyEntryPairs as $keyEntryPair) {
+            list($key, $value) = $keyEntryPair[1];
+            $builder->add($value, $key);
+        }
+        return $builder->build();
+    }
+
+
+    /**
+     * @return Enumerable
+     */
+    public function view()
+    {
+        return \Traver\view($this->asTraversable());
     }
 
     /**
@@ -525,5 +536,14 @@ trait EnumerableLike
         }
 
         return $proxy;
+    }
+
+    /**
+     * Tests if the collection is vector like. The result is used to control preservation of keys.
+     * @return mixed
+     */
+    public function isVectorLike()
+    {
+        return false;
     }
 }

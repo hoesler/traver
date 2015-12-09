@@ -4,9 +4,8 @@ namespace Traver\Iterator;
 
 
 use Iterator;
-use OuterIterator;
 
-class TransformingIterator implements OuterIterator
+class TransformingIterator extends ForwardingIterator
 {
     /**
      * @var Iterator
@@ -39,7 +38,7 @@ class TransformingIterator implements OuterIterator
     {
         $function = $this->mappingFunction;
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($key, $value) = $function($this->delegate->key(), $this->delegate->current(), $this->index);
+        list($key, $value) = $function(parent::key(), parent::current(), $this->index);
         return $value;
     }
 
@@ -48,7 +47,7 @@ class TransformingIterator implements OuterIterator
      */
     public function next()
     {
-        $this->delegate->next();
+        parent::next();
         $this->index++;
     }
 
@@ -59,16 +58,8 @@ class TransformingIterator implements OuterIterator
     {
         $function = $this->mappingFunction;
         /** @noinspection PhpUnusedLocalVariableInspection */
-        list($key, $value) = $function($this->delegate->key(), $this->delegate->current(), $this->index);
+        list($key, $value) = $function(parent::key(), parent::current(), $this->index);
         return $key;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function valid()
-    {
-        return $this->delegate->valid();
     }
 
     /**
@@ -76,7 +67,7 @@ class TransformingIterator implements OuterIterator
      */
     public function rewind()
     {
-        $this->delegate->rewind();
+        parent::rewind();
         $this->index = 0;
     }
 

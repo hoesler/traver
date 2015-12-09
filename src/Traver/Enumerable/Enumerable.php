@@ -123,7 +123,7 @@ interface Enumerable extends \Traversable, \Countable
      * <p>Note: this method is not re-implemented by views.
      * This means when applied to a view it will always force the view and return a new traversable collection.</p>
      * @param callable $keyFunction
-     * @return Map
+     * @return Collection
      */
     public function groupBy(callable $keyFunction);
 
@@ -203,6 +203,8 @@ interface Enumerable extends \Traversable, \Countable
      * @param callable $compareFunction A function accepting two [key, value] pairs returning an integer less than,
      * equal to, or greater than zero if the first argument is considered to be respectively less than, equal to,
      * or greater than the second.
+     * <p>Note: this method is not re-implemented by views.
+     * This means when applied to a view it will always force the view and return a new traversable collection.</p>
      * @return Enumerable
      * @see usort
      * @see sortBy
@@ -213,6 +215,8 @@ interface Enumerable extends \Traversable, \Countable
      * Creates a new enumerable containing all items in this enumerable sorted by the result of the mappingFunction.
      * <p>This implementation first applies the mapping function to each entry, than sorts a temporary enumerable by the computed keys.
      * From this enumerable a new enumerable it created by extracting the entries at the resulting index.</p>
+     * <p>Note: this method is not re-implemented by views.
+     * This means when applied to a view it will always force the view and return a new traversable collection.</p>
      * @param callable $mappingFunction
      * @return Enumerable
      * @see sort
@@ -221,7 +225,7 @@ interface Enumerable extends \Traversable, \Countable
 
     /**
      * Transforms this enumerable into an array.
-     * @param bool $preserveKeys indicates if the keys should be preserved or if values should be re-indexed.
+     * @param bool $preserveKeys indicates if the keys should be preserved or if values should be re-indexed (Has no effect for vectors).
      * @return array
      */
     public function toArray($preserveKeys = true);

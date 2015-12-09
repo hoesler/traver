@@ -4,24 +4,20 @@
 namespace Traver\Enumerable;
 
 
-class EnumerableView implements \IteratorAggregate, Enumerable
+trait EnumerableView
 {
     use EnumerableViewLike;
 
     /**
-     * EnumerableView constructor.
-     * @param \IteratorAggregate $delegate
+     * @codeCoverageIgnore
      */
-    public function __construct($delegate)
+    final protected function builder()
     {
-        $this->delegate = $delegate;
+        return $this->delegate()->builder();
     }
 
     /**
-     * @inheritDoc
+     * @return EnumerableViewLike
      */
-    public function getIterator()
-    {
-        return $this->delegate->getIterator();
-    }
+    protected abstract function delegate();
 }
