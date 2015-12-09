@@ -551,5 +551,5 @@ trait EnumerableLike
      * Tests if the collection is vector like. The result is used to control preservation of keys.
      * @return mixed
      */
-    public abstract function isVectorLike();
+    abstract public function isVectorLike();
 }

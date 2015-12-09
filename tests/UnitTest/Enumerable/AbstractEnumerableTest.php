@@ -35,7 +35,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($mapped));
     }
 
-    public abstract function mapProvider();
+    abstract public function mapProvider();
 
     /**
      * @covers ::isEmpty
@@ -57,7 +57,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $isEmpty);
     }
 
-    public abstract function emptyProvider();
+    abstract public function emptyProvider();
 
     /**
      * @covers ::slice
@@ -83,7 +83,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $actual);
     }
 
-    public abstract function sliceProvider();
+    abstract public function sliceProvider();
 
     /**
      * @dataProvider toArrayProvider
@@ -106,7 +106,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $toArray);
     }
 
-    public abstract function toArrayProvider();
+    abstract public function toArrayProvider();
 
     /**
      * @covers ::takeWhile
@@ -130,7 +130,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($taken));
     }
 
-    public abstract function takeWhileProvider();
+    abstract public function takeWhileProvider();
 
     /**
      * @covers ::select
@@ -154,7 +154,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($filtered));
     }
 
-    public abstract function selectProvider();
+    abstract public function selectProvider();
 
     /**
      * @covers ::flatMap
@@ -177,7 +177,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($var));
     }
 
-    public abstract function flatMapProvider();
+    abstract public function flatMapProvider();
 
     /**
      * @covers ::all
@@ -200,7 +200,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $all);
     }
 
-    public abstract function allProvider();
+    abstract public function allProvider();
 
     /**
      * @covers ::any
@@ -223,7 +223,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $any);
     }
 
-    public abstract function anyProvider();
+    abstract public function anyProvider();
 
     /**
      * @covers ::groupBy
@@ -257,7 +257,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $actualAsArray);
     }
 
-    public abstract function groupByProvider();
+    abstract public function groupByProvider();
 
     /**
      * @covers ::reduce
@@ -280,7 +280,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $reduced);
     }
 
-    public abstract function reduceProvider();
+    abstract public function reduceProvider();
 
     /**
      * @covers ::reduce
@@ -321,7 +321,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, $reduced);
     }
 
-    public abstract function reduceOptionProvider();
+    abstract public function reduceOptionProvider();
 
     /**
      * @covers ::join
@@ -344,7 +344,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($joined, $expected);
     }
 
-    public abstract function joinProvider();
+    abstract public function joinProvider();
 
     /**
      * @covers ::keys
@@ -367,7 +367,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($keys));
     }
 
-    public abstract function keysProvider();
+    abstract public function keysProvider();
 
     /**
      * @covers ::values
@@ -390,7 +390,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($values));
     }
 
-    public abstract function valuesProvider();
+    abstract public function valuesProvider();
 
     /**
      * @covers ::entries
@@ -413,7 +413,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($entries));
     }
 
-    public abstract function entriesProvider();
+    abstract public function entriesProvider();
 
     /**
      * @covers ::sort
@@ -437,7 +437,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($sorted));
     }
 
-    public abstract function sortProvider();
+    abstract public function sortProvider();
 
     /**
      * @covers ::sortBy
@@ -461,7 +461,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         self::assertEquals($expected, iterator_to_array($sorted));
     }
 
-    public abstract function sortByProvider();
+    abstract public function sortByProvider();
 
     /**
      * @covers ::head
@@ -523,7 +523,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($filtered));
     }
 
-    public abstract function rejectProvider();
+    abstract public function rejectProvider();
 
     /**
      * @dataProvider findProvider
@@ -546,7 +546,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, $var);
     }
 
-    public abstract function findProvider();
+    abstract public function findProvider();
 
     /**
      * @dataProvider tailProvider
@@ -569,7 +569,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($tail));
     }
 
-    public abstract function tailProvider();
+    abstract public function tailProvider();
 
     /**
      * @dataProvider dropProvider
@@ -593,7 +593,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($drop));
     }
 
-    public abstract function dropProvider();
+    abstract public function dropProvider();
 
     /**
      * @dataProvider dropWhileProvider
@@ -617,7 +617,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($dropWhile));
     }
 
-    public abstract function dropWhileProvider();
+    abstract public function dropWhileProvider();
 
     /**
      * @dataProvider takeProvider
@@ -641,7 +641,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($taken));
     }
 
-    public abstract function takeProvider();
+    abstract public function takeProvider();
 
     /**
      * @dataProvider eachProvider
@@ -665,7 +665,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($array, $copy);
     }
 
-    public abstract function eachProvider();
+    abstract public function eachProvider();
 
     /**
      * @dataProvider countProvider
@@ -687,7 +687,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, $count);
     }
 
-    public abstract function countProvider();
+    abstract public function countProvider();
 
     /**
      * @dataProvider countWhichProvider
@@ -710,7 +710,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($expected, $count);
     }
 
-    public abstract function countWhichProvider();
+    abstract public function countWhichProvider();
 
     /**
      * @dataProvider asTraversableProvider
@@ -732,5 +732,5 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($array, iterator_to_array($traversable));
     }
 
-    public abstract function asTraversableProvider();
+    abstract public function asTraversableProvider();
 }

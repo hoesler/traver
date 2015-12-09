@@ -9,5 +9,5 @@ trait BuildableCollectionTest
     /**
      * @return \Traver\Enumerable\Builder
      */
-    protected abstract function createBuilder();
+    abstract protected function createBuilder();
 }

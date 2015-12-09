@@ -16,7 +16,7 @@ trait EnumerableView
     /**
      * @return EnumerableViewLike
      */
-    protected abstract function delegate();
+    abstract protected function delegate();
 
     /**
      * @codeCoverageIgnore
