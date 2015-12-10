@@ -7,9 +7,9 @@ namespace Traver\Collection;
 use Iterator;
 use Traver\Exception\UnsupportedOperationException;
 
-trait EnumerableViewLike
+trait PipeableViewLike
 {
-    use EnumerableLike;
+    use PipeableLike;
 
     public function map(callable $mappingFunction)
     {

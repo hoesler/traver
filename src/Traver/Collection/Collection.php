@@ -4,6 +4,6 @@
 namespace Traver\Collection;
 
 
-interface Collection extends \ArrayAccess, Enumerable
+interface Collection extends \ArrayAccess, Pipeable
 {
 }

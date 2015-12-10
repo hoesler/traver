@@ -6,10 +6,10 @@ namespace Traver\Test\UnitTest\Collection;
 
 use PHPUnit_Framework_Assert;
 use PHPUnit_Framework_TestCase;
-use Traver\Collection\Enumerable;
+use Traver\Collection\Pipeable;
 use Traversable;
 
-abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
+abstract class AbstractPipeableTest extends PHPUnit_Framework_TestCase
 {
     use BuildableCollectionTest;
 
@@ -31,7 +31,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $mapped = $enumerable->map($mappingFunction);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $mapped);
+        self::assertInstanceOf(Pipeable::class, $mapped);
         self::assertEquals($expected, iterator_to_array($mapped));
     }
 
@@ -126,7 +126,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $taken = $enumerable->takeWhile($predicate);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $taken);
+        self::assertInstanceOf(Pipeable::class, $taken);
         self::assertEquals($expected, iterator_to_array($taken));
     }
 
@@ -150,7 +150,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $filtered = $enumerable->select($predicate);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $filtered);
+        self::assertInstanceOf(Pipeable::class, $filtered);
         self::assertEquals($expected, iterator_to_array($filtered));
     }
 
@@ -243,11 +243,11 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $group = $enumerable->groupBy($keyFunction);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $group);
+        self::assertInstanceOf(Pipeable::class, $group);
         self::assertEquals(array_keys($expected), array_keys(iterator_to_array($group)),
             "Group keys differ.");
         $allValuesAreEnumerables = array_reduce(array_values(iterator_to_array($group)), function ($all, $e) {
-            return $all && ($e instanceof Enumerable);
+            return $all && ($e instanceof Pipeable);
         }, true);
         self::assertTrue($allValuesAreEnumerables);
 
@@ -363,7 +363,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $keys = $enumerable->keys();
 
         // then
-        self::assertInstanceOf(Enumerable::class, $keys);
+        self::assertInstanceOf(Pipeable::class, $keys);
         self::assertEquals($expected, iterator_to_array($keys));
     }
 
@@ -386,7 +386,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $values = $enumerable->values();
 
         // then
-        self::assertInstanceOf(Enumerable::class, $values);
+        self::assertInstanceOf(Pipeable::class, $values);
         self::assertEquals($expected, iterator_to_array($values));
     }
 
@@ -409,7 +409,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $entries = $enumerable->entries();
 
         // then
-        self::assertInstanceOf(Enumerable::class, $entries);
+        self::assertInstanceOf(Pipeable::class, $entries);
         self::assertEquals($expected, iterator_to_array($entries));
     }
 
@@ -433,7 +433,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $sorted = $enumerable->sort(...$args);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $sorted);
+        self::assertInstanceOf(Pipeable::class, $sorted);
         self::assertEquals($expected, iterator_to_array($sorted));
     }
 
@@ -457,7 +457,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $sorted = $enumerable->sortBy($callback);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $sorted);
+        self::assertInstanceOf(Pipeable::class, $sorted);
         self::assertEquals($expected, iterator_to_array($sorted));
     }
 
@@ -519,7 +519,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $filtered = $enumerable->reject(...$rejectArgs);
 
         // then
-        PHPUnit_Framework_Assert::assertInstanceOf(Enumerable::class, $filtered);
+        PHPUnit_Framework_Assert::assertInstanceOf(Pipeable::class, $filtered);
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($filtered));
     }
 
@@ -565,7 +565,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $tail = $enumerable->tail();
 
         // then
-        PHPUnit_Framework_Assert::assertInstanceOf(Enumerable::class, $tail);
+        PHPUnit_Framework_Assert::assertInstanceOf(Pipeable::class, $tail);
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($tail));
     }
 
@@ -589,7 +589,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $drop = $enumerable->drop($n);
 
         // then
-        PHPUnit_Framework_Assert::assertInstanceOf(Enumerable::class, $drop);
+        PHPUnit_Framework_Assert::assertInstanceOf(Pipeable::class, $drop);
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($drop));
     }
 
@@ -613,7 +613,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $dropWhile = $enumerable->dropWhile($predicate);
 
         // then
-        PHPUnit_Framework_Assert::assertInstanceOf(Enumerable::class, $dropWhile);
+        PHPUnit_Framework_Assert::assertInstanceOf(Pipeable::class, $dropWhile);
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($dropWhile));
     }
 
@@ -637,7 +637,7 @@ abstract class AbstractEnumerableTest extends PHPUnit_Framework_TestCase
         $taken = $enumerable->take($n);
 
         // then
-        PHPUnit_Framework_Assert::assertInstanceOf(Enumerable::class, $taken);
+        PHPUnit_Framework_Assert::assertInstanceOf(Pipeable::class, $taken);
         PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($taken));
     }
 

@@ -3,7 +3,7 @@
 namespace Traver\Test\UnitTest;
 
 use PHPUnit_Framework_TestCase;
-use Traver\Collection\Enumerable;
+use Traver\Collection\Pipeable;
 
 class FunctionsTest extends PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class FunctionsTest extends PHPUnit_Framework_TestCase
         $view = \Traver\view($array);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $view);
+        self::assertInstanceOf(Pipeable::class, $view);
     }
 
     public function viewProvider()
@@ -46,7 +46,7 @@ class FunctionsTest extends PHPUnit_Framework_TestCase
         $view = \Traver\in($array);
 
         // then
-        self::assertInstanceOf(Enumerable::class, $view);
+        self::assertInstanceOf(Pipeable::class, $view);
     }
 
     public function inProvider()

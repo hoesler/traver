@@ -2,9 +2,9 @@
 namespace Traver\Collection\View;
 
 use LimitIterator;
-use Traver\Collection\Enumerable;
-use Traver\Collection\EnumerableView;
-use Traver\Collection\EnumerableViewLike;
+use Traver\Collection\Pipeable;
+use Traver\Collection\PipeableView;
+use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\ReindexingIterator;
 
 /**
@@ -13,9 +13,9 @@ use Traver\Iterator\ReindexingIterator;
  * @codeCoverageIgnore
  * @internal
  */
-class Sliced implements \IteratorAggregate, Enumerable
+class Sliced implements \IteratorAggregate, Pipeable
 {
-    use EnumerableView;
+    use PipeableView;
 
     /**
      * @var
@@ -29,7 +29,7 @@ class Sliced implements \IteratorAggregate, Enumerable
 
     /**
      * MapView constructor.
-     * @param EnumerableViewLike $delegate
+     * @param PipeableViewLike $delegate
      * @param $from
      * @param $until
      */

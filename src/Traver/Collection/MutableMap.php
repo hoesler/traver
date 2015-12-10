@@ -6,7 +6,7 @@ namespace Traver\Collection;
 
 class MutableMap implements \IteratorAggregate, Collection
 {
-    use EnumerableLike;
+    use PipeableLike;
     use ForwardingArrayAccess;
 
     /**
@@ -65,7 +65,7 @@ class MutableMapBuilder implements Builder
     use FromArrayBuilder;
 
     /**
-     * @return Enumerable
+     * @return Pipeable
      */
     public function build()
     {

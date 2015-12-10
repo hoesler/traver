@@ -3,15 +3,15 @@
 namespace Traver;
 
 use Traver\Callback\OperatorCallbacks;
-use Traver\Collection\Enumerable;
 use Traver\Collection\ImmutableMap;
 use Traver\Collection\ImmutableVector;
+use Traver\Collection\Pipeable;
 use Traversable;
 
 if (!function_exists('Traver\view')) {
     /**
      * @param array|Traversable $collection
-     * @return Enumerable
+     * @return Pipeable
      */
     function view($collection)
     {
@@ -28,7 +28,7 @@ if (!function_exists('Traver\view')) {
 if (!function_exists('Traver\in')) {
     /**
      * @param array|Traversable $collection
-     * @return Enumerable
+     * @return Pipeable
      */
     function in($collection)
     {

@@ -7,10 +7,19 @@ $callback($value, $key);
 For PHP functions like 'is_string', however, this wouldn't work, because they require exactly one argument.
 
 The second option is to offer two versions of the same method with with different method names as in Hack. This would of course inflate the number of methods. Probably for this reason, Hack offers both versions only for map and filter.
-A third option, which I chose here, is to always pass both arguments (value, key) but use reflection to check for the number of accepted parameters. Than wrap callbacks, which accept only (exactly) one argument in a closure with accepts both arguments. This comes at a negligible cost of performance but make the methods much more versatile.
+
+A third option, which I chose here, is to always pass both arguments (value, key) but use reflection to check for the number of accepted parameters. Than wrap callbacks which accept only (exactly) one argument in a closure with accepts both arguments. This comes at a negligible cost of performance but make the methods much more versatile:
+```
+$collection->select('is_string');
+```.
 
 ## Examples
 ```
+use function Traver\in; // creates a new ImmutableMap from an array
+
+$even = function ($number) { return $number & 1 == 0; };
+in([1, 2, 3])->select($even); // [1 => 2]
+
 in([1, 2, 3])->reduce(op("+"));
 in(['a', 'b', 'c'])->map('ucfirst'); // ['A', 'B', 'C']
 ```

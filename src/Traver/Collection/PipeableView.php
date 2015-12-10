@@ -4,9 +4,9 @@
 namespace Traver\Collection;
 
 
-trait EnumerableView
+trait PipeableView
 {
-    use EnumerableViewLike;
+    use PipeableViewLike;
 
     public function isVectorLike()
     {
@@ -14,7 +14,7 @@ trait EnumerableView
     }
 
     /**
-     * @return EnumerableViewLike
+     * @return PipeableViewLike
      */
     abstract protected function delegate();
 

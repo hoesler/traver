@@ -1,9 +1,9 @@
 <?php
 namespace Traver\Collection\View;
 
-use Traver\Collection\Enumerable;
-use Traver\Collection\EnumerableView;
-use Traver\Collection\EnumerableViewLike;
+use Traver\Collection\Pipeable;
+use Traver\Collection\PipeableView;
+use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\ConcatIterator;
 use Traver\Iterator\MappingIterator;
 use Traver\Iterator\ReindexingIterator;
@@ -14,9 +14,9 @@ use Traver\Iterator\ReindexingIterator;
  * @codeCoverageIgnore
  * @internal
  */
-class FlatMapped implements \IteratorAggregate, Enumerable
+class FlatMapped implements \IteratorAggregate, Pipeable
 {
-    use EnumerableView;
+    use PipeableView;
 
     /**
      * @var callable
@@ -25,7 +25,7 @@ class FlatMapped implements \IteratorAggregate, Enumerable
 
     /**
      * MapView constructor.
-     * @param EnumerableViewLike $delegate
+     * @param PipeableViewLike $delegate
      * @param callable $mappingFunction
      */
     public function __construct($delegate, $mappingFunction)

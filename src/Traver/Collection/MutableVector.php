@@ -9,7 +9,7 @@ use SplFixedArray;
 
 class MutableVector implements \IteratorAggregate, Collection
 {
-    use EnumerableLike;
+    use PipeableLike;
     use ForwardingArrayAccess;
 
     /**
@@ -80,7 +80,7 @@ class MutableVectorBuilder implements Builder
     use FromArrayBuilder;
 
     /**
-     * @return Enumerable
+     * @return Pipeable
      */
     public function build()
     {

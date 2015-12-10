@@ -1,9 +1,9 @@
 <?php
 namespace Traver\Collection\View;
 
-use Traver\Collection\Enumerable;
-use Traver\Collection\EnumerableView;
-use Traver\Collection\EnumerableViewLike;
+use Traver\Collection\Pipeable;
+use Traver\Collection\PipeableView;
+use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\CallbackOffsetIterator;
 use Traver\Iterator\ReindexingIterator;
 
@@ -13,9 +13,9 @@ use Traver\Iterator\ReindexingIterator;
  * @codeCoverageIgnore
  * @internal
  */
-class DroppedWhile implements \IteratorAggregate, Enumerable
+class DroppedWhile implements \IteratorAggregate, Pipeable
 {
-    use EnumerableView;
+    use PipeableView;
 
     /**
      * @var callable
@@ -23,13 +23,13 @@ class DroppedWhile implements \IteratorAggregate, Enumerable
     private $predicate;
 
     /**
-     * @var EnumerableViewLike
+     * @var PipeableViewLike
      */
     private $delegate;
 
     /**
      * Dropped constructor.
-     * @param EnumerableViewLike $delegate
+     * @param PipeableViewLike $delegate
      * @param callable $predicate
      */
     public function __construct($delegate, $predicate)

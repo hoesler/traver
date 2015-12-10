@@ -14,14 +14,14 @@ use Traver\Exception\UnsupportedOperationException;
 use Traversable;
 
 /**
- * Class EnumerableLike
+ * Class PipeableLike
  * @package Traver\Collection
- * @implements Enumerable
+ * @implements Pipeable
  */
-trait EnumerableLike
+trait PipeableLike
 {
     /**
-     * Implements {@link Enumerable::head}.
+     * Implements {@link Pipeable::head}.
      * @return mixed
      */
     public function head()
@@ -39,14 +39,14 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::asTraversable}.
+     * Implements {@link Pipeable::asTraversable}.
      * @return Traversable
      */
     abstract public function asTraversable();
 
     /**
-     * Implements {@link Enumerable::tail}.
-     * @return EnumerableLike
+     * Implements {@link Pipeable::tail}.
+     * @return PipeableLike
      */
     public function tail()
     {
@@ -57,7 +57,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::isEmpty}.
+     * Implements {@link Pipeable::isEmpty}.
      * @return bool
      */
     public function isEmpty()
@@ -71,9 +71,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::drop}.
+     * Implements {@link Pipeable::drop}.
      * @param $n
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function drop($n)
     {
@@ -81,10 +81,10 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::slice}.
+     * Implements {@link Pipeable::slice}.
      * @param int $from
      * @param int $until
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function slice($from, $until)
     {
@@ -105,13 +105,13 @@ trait EnumerableLike
     }
 
     /**
-     * Creates a new Builder for the current class implementing Enumerable.
+     * Creates a new Builder for the current class implementing Pipeable.
      * @return Builder
      */
     abstract protected function builder();
 
     /**
-     * Implements {@link Enumerable::count}.
+     * Implements {@link Pipeable::count}.
      * @return int
      */
     public function count()
@@ -120,7 +120,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::countWhich}.
+     * Implements {@link Pipeable::countWhich}.
      * @param callable $predicate
      * @return int
      */
@@ -156,9 +156,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::select}.
+     * Implements {@link Pipeable::select}.
      * @param callable $predicate
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function select(callable $predicate)
     {
@@ -174,9 +174,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::dropWhile}.
+     * Implements {@link Pipeable::dropWhile}.
      * @param callable $predicate
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function dropWhile(callable $predicate)
     {
@@ -195,9 +195,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::take}.
+     * Implements {@link Pipeable::take}.
      * @param int $n
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function take($n)
     {
@@ -205,9 +205,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::takeWhile}.
+     * Implements {@link Pipeable::takeWhile}.
      * @param callable $predicate
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function takeWhile(callable $predicate)
     {
@@ -223,9 +223,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::reject}.
+     * Implements {@link Pipeable::reject}.
      * @param callable $predicate
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function reject(callable $predicate)
     {
@@ -241,7 +241,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::find}.
+     * Implements {@link Pipeable::find}.
      * @param callable $predicate
      * @return Option
      */
@@ -258,9 +258,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::flatMap}.
+     * Implements {@link Pipeable::flatMap}.
      * @param callable $mappingFunction
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function flatMap(callable $mappingFunction)
     {
@@ -278,7 +278,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::all}.
+     * Implements {@link Pipeable::all}.
      * @param callable $predicate
      * @return bool
      */
@@ -294,7 +294,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::any}.
+     * Implements {@link Pipeable::any}.
      * @param callable $predicate
      * @return bool
      */
@@ -311,8 +311,8 @@ trait EnumerableLike
 
     /**
      * @param callable $keyFunction
-     * @return EnumerableLike
-     * @see Enumerable::groupBy
+     * @return PipeableLike
+     * @see Pipeable::groupBy
      */
     public function groupBy(callable $keyFunction)
     {
@@ -328,15 +328,15 @@ trait EnumerableLike
 
         $builder = ImmutableMap::newBuilder();
         foreach ($result as $key => $group) {
-            $groupEnumerable = $this->newCollection($group);
-            $builder->add($groupEnumerable, $key);
+            $groupPipeable = $this->newCollection($group);
+            $builder->add($groupPipeable, $key);
         }
         return $builder->build();
     }
 
     /**
      * @param $array |Traversable
-     * @return Enumerable
+     * @return Pipeable
      */
     protected final function newCollection($array)
     {
@@ -347,7 +347,7 @@ trait EnumerableLike
      * Concatenates the strval of all elements separated by the given separator.
      * @param $separator
      * @return mixed
-     * @see Enumerable::join
+     * @see Pipeable::join
      */
     public function join($separator = '')
     {
@@ -357,7 +357,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::reduceOption}.
+     * Implements {@link Pipeable::reduceOption}.
      * @param callable $binaryFunction
      * @param mixed $initial
      * @return Option
@@ -376,7 +376,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::reduce}.
+     * Implements {@link Pipeable::reduce}.
      * @param callable $binaryFunction
      * @param mixed $initial
      * @return mixed
@@ -404,8 +404,8 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::keys}.
-     * @return EnumerableLike
+     * Implements {@link Pipeable::keys}.
+     * @return PipeableLike
      */
     public function keys()
     {
@@ -417,7 +417,7 @@ trait EnumerableLike
 
     /**
      * @param callable $transformationFunction
-     * @return EnumerableLike
+     * @return PipeableLike
      * @codeCoverageIgnore
      * @internal
      */
@@ -434,8 +434,8 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::values}.
-     * @return EnumerableLike
+     * Implements {@link Pipeable::values}.
+     * @return PipeableLike
      */
     public function values()
     {
@@ -446,8 +446,8 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::entries}.
-     * @return EnumerableLike
+     * Implements {@link Pipeable::entries}.
+     * @return PipeableLike
      */
     public function entries()
     {
@@ -458,7 +458,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::each}.
+     * Implements {@link Pipeable::each}.
      * @param callable $f
      */
     public function each(callable $f)
@@ -470,9 +470,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::sortBy}.
+     * Implements {@link Pipeable::sortBy}.
      * @param callable $mappingFunction
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function sortBy(callable $mappingFunction)
     {
@@ -492,9 +492,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::sort}.
+     * Implements {@link Pipeable::sort}.
      * @param callable|null $compareFunction
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function sort(callable $compareFunction = null)
     {
@@ -511,7 +511,7 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::toArray}.
+     * Implements {@link Pipeable::toArray}.
      * @param bool $preserveKeys
      * @return array
      */
@@ -521,9 +521,9 @@ trait EnumerableLike
     }
 
     /**
-     * Implements {@link Enumerable::map}.
+     * Implements {@link Pipeable::map}.
      * @param callable $mappingFunction
-     * @return EnumerableLike
+     * @return PipeableLike
      */
     public function map(callable $mappingFunction)
     {
@@ -536,7 +536,7 @@ trait EnumerableLike
     }
 
     /**
-     * @return Enumerable
+     * @return Pipeable
      */
     protected final function mutableCopy()
     {

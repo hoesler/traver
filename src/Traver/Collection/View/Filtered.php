@@ -2,9 +2,9 @@
 namespace Traver\Collection\View;
 
 use CallbackFilterIterator;
-use Traver\Collection\Enumerable;
-use Traver\Collection\EnumerableView;
-use Traver\Collection\EnumerableViewLike;
+use Traver\Collection\Pipeable;
+use Traver\Collection\PipeableView;
+use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\ReindexingIterator;
 
 /**
@@ -13,9 +13,9 @@ use Traver\Iterator\ReindexingIterator;
  * @codeCoverageIgnore
  * @internal
  */
-class Filtered implements \IteratorAggregate, Enumerable
+class Filtered implements \IteratorAggregate, Pipeable
 {
-    use EnumerableView;
+    use PipeableView;
 
     /**
      * @var callable
@@ -24,7 +24,7 @@ class Filtered implements \IteratorAggregate, Enumerable
 
     /**
      * Dropped constructor.
-     * @param EnumerableViewLike $delegate
+     * @param PipeableViewLike $delegate
      * @param callable $predicate
      */
     public function __construct($delegate, $predicate)

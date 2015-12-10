@@ -9,7 +9,7 @@ use Iterator;
 
 class ImmutableMap implements \IteratorAggregate, Collection
 {
-    use EnumerableViewLike;
+    use PipeableViewLike;
     use ImmutableArrayAccess;
 
     /**

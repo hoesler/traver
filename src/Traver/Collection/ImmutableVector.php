@@ -15,7 +15,7 @@ use SplFixedArray;
  */
 class ImmutableVector implements \IteratorAggregate, Collection
 {
-    use EnumerableViewLike;
+    use PipeableViewLike;
     use ImmutableArrayAccess;
 
     /**

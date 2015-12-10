@@ -9,7 +9,7 @@ use PhpOption\Some;
 use Traver\Callback\Comparators;
 use Traver\Callback\OperatorCallbacks;
 
-abstract class AbstractVectorTest extends AbstractEnumerableTest
+abstract class AbstractVectorTest extends AbstractPipeableTest
 {
 
     public function asTraversableProvider()

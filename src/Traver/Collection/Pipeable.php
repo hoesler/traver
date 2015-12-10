@@ -8,12 +8,12 @@ use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
 use Traversable;
 
-interface Enumerable extends \Traversable, \Countable
+interface Pipeable extends \Traversable, \Countable
 {
     /**
-     * Creates a new Enumerable by applying a function to all elements of {@link asTraversable()}.
+     * Creates a new Pipeable by applying a function to all elements of {@link asTraversable()}.
      * @param callable $mappingFunction the function to apply to each value. Arguments are: value.
-     * @return Enumerable A new traversable collection resulting from applying the given mappingFunction to each element
+     * @return Pipeable A new traversable collection resulting from applying the given mappingFunction to each element
      * of this traversable collection and collecting the results.
      */
     public function map(callable $mappingFunction);
@@ -27,16 +27,16 @@ interface Enumerable extends \Traversable, \Countable
     public function head();
 
     /**
-     * Selects all elements in the enumerable except the first.
+     * Selects all elements in the pipeable except the first.
      * The returned traversable preserves the keys.
-     * @return Enumerable
+     * @return Pipeable
      * @throws UnsupportedOperationException if the traversable collection is empty.
      * @see drop
      */
     public function tail();
 
     /**
-     * Counts the number of elements in the enumerable which satisfy a predicate.
+     * Counts the number of elements in the pipeable which satisfy a predicate.
      * @param callable $predicate
      * @return int
      */
@@ -45,7 +45,7 @@ interface Enumerable extends \Traversable, \Countable
     /**
      * Selects all elements except first n ones.
      * @param int $n
-     * @return Enumerable
+     * @return Pipeable
      * @see slice
      */
     public function drop($n);
@@ -53,14 +53,14 @@ interface Enumerable extends \Traversable, \Countable
     /**
      * Drops longest prefix of elements that satisfy a predicate.
      * @param callable $predicate
-     * @return Enumerable
+     * @return Pipeable
      */
     public function dropWhile(callable $predicate);
 
     /**
      * Selects the first n elements.
      * @param int $n
-     * @return Enumerable
+     * @return Pipeable
      * @see slice
      */
     public function take($n);
@@ -68,22 +68,22 @@ interface Enumerable extends \Traversable, \Countable
     /**
      * Selects the longest prefix of elements that satisfy a predicate.
      * @param callable $predicate
-     * @return Enumerable
+     * @return Pipeable
      */
     public function takeWhile(callable $predicate);
 
     /**
-     * Selects all elements of the enumerable which satisfy a predicate.
+     * Selects all elements of the pipeable which satisfy a predicate.
      * @param callable $predicate
-     * @return Enumerable
+     * @return Pipeable
      * @see reject
      */
     public function select(callable $predicate);
 
     /**
-     * Selects all elements of the enumerable which do not satisfy a predicate.
+     * Selects all elements of the pipeable which do not satisfy a predicate.
      * @param callable $predicate
-     * @return Enumerable
+     * @return Pipeable
      * @see select
      */
     public function reject(callable $predicate);
@@ -95,15 +95,15 @@ interface Enumerable extends \Traversable, \Countable
     public function find(callable $predicate);
 
     /**
-     * Builds a new collection by applying a function to all elements of the enumerable.
+     * Builds a new collection by applying a function to all elements of the pipeable.
      * and using the elements of the resulting collections.
      * @param callable $mappingFunction A function which maps each element of this collection to an array or a Traversable.
-     * @return Enumerable
+     * @return Pipeable
      */
     public function flatMap(callable $mappingFunction);
 
     /**
-     * Tests whether a predicate holds for all elements of the enumerable.
+     * Tests whether a predicate holds for all elements of the pipeable.
      * @param callable $predicate
      * @return bool
      * @see any
@@ -111,7 +111,7 @@ interface Enumerable extends \Traversable, \Countable
     public function all(callable $predicate);
 
     /**
-     * Tests whether a predicate holds for any element of the enumerable.
+     * Tests whether a predicate holds for any element of the pipeable.
      * @param callable $predicate
      * @return bool
      * @see all
@@ -119,7 +119,7 @@ interface Enumerable extends \Traversable, \Countable
     public function any(callable $predicate);
 
     /**
-     * Partitions the enumerable into a map of traversable collections according to some discriminator function.
+     * Partitions the pipeable into a map of traversable collections according to some discriminator function.
      * <p>Note: this method is not re-implemented by views.
      * This means when applied to a view it will always force the view and return a new traversable collection.</p>
      * @param callable $keyFunction
@@ -136,7 +136,7 @@ interface Enumerable extends \Traversable, \Countable
     public function join($separator = '');
 
     /**
-     * Applies the binary function to all elements of the enumerable with initial as the first value, if given.
+     * Applies the binary function to all elements of the pipeable with initial as the first value, if given.
      * Throws a {@link NoSuchElementException} If the traversable is empty and initial is not given.
      * @param callable $binaryFunction
      * @param mixed $initial
@@ -146,7 +146,7 @@ interface Enumerable extends \Traversable, \Countable
     public function reduce(callable $binaryFunction, $initial = null);
 
     /**
-     * Applies the binary function to all elements of the enumerable with initial as the first value, if given.
+     * Applies the binary function to all elements of the pipeable with initial as the first value, if given.
      * Returns the result as {@link Some}.
      * If the traversable is empty and initial is not given, return {@link None}.
      * @param callable $binaryFunction
@@ -159,14 +159,14 @@ interface Enumerable extends \Traversable, \Countable
      * Selects the elements in the interval [from, until).
      * @param int $from
      * @param int $until
-     * @return Enumerable
+     * @return Pipeable
      * @see take
      * @see drop
      */
     public function slice($from, $until);
 
     /**
-     * Apply function f to all elements in this enumerable.
+     * Apply function f to all elements in this pipeable.
      * If the callback accepts one argument, is is called with $f(value).
      * If it accepts two arguments, it is called with $f(key, value).
      * @param callable $f
@@ -174,20 +174,20 @@ interface Enumerable extends \Traversable, \Countable
     public function each(callable $f);
 
     /**
-     * Returns a new enumerable with the keys of this enumerable as values and their index as keys.
-     * @return Enumerable
+     * Returns a new pipeable with the keys of this pipeable as values and their index as keys.
+     * @return Pipeable
      */
     public function keys();
 
     /**
-     * Returns a new enumerable with the values of this enumerable as values and their index as keys.
-     * @return Enumerable
+     * Returns a new pipeable with the values of this pipeable as values and their index as keys.
+     * @return Pipeable
      */
     public function values();
 
     /**
-     * Transforms this enumerable to a new enumerable with the current (key, value) pairs as values and their index as keys.
-     * @return Enumerable
+     * Transforms this pipeable to a new pipeable with the current (key, value) pairs as values and their index as keys.
+     * @return Pipeable
      */
     public function entries();
 
@@ -198,42 +198,42 @@ interface Enumerable extends \Traversable, \Countable
     public function isEmpty();
 
     /**
-     * Creates a new enumerable containing all items in this enumerable sorted, either according to their natural order,
+     * Creates a new pipeable containing all items in this pipeable sorted, either according to their natural order,
      * or by using the results of the supplied compareFunction.
      * @param callable $compareFunction A function accepting two [key, value] pairs returning an integer less than,
      * equal to, or greater than zero if the first argument is considered to be respectively less than, equal to,
      * or greater than the second.
      * <p>Note: this method is not re-implemented by views.
      * This means when applied to a view it will always force the view and return a new traversable collection.</p>
-     * @return Enumerable
+     * @return Pipeable
      * @see usort
      * @see sortBy
      */
     public function sort(callable $compareFunction = null);
 
     /**
-     * Creates a new enumerable containing all items in this enumerable sorted by the result of the mappingFunction.
-     * <p>This implementation first applies the mapping function to each entry, than sorts a temporary enumerable by the computed keys.
-     * From this enumerable a new enumerable it created by extracting the entries at the resulting index.</p>
+     * Creates a new pipeable containing all items in this pipeable sorted by the result of the mappingFunction.
+     * <p>This implementation first applies the mapping function to each entry, than sorts a temporary pipeable by the computed keys.
+     * From this pipeable a new pipeable it created by extracting the entries at the resulting index.</p>
      * <p>Note: this method is not re-implemented by views.
      * This means when applied to a view it will always force the view and return a new traversable collection.</p>
      * @param callable $mappingFunction
-     * @return Enumerable
+     * @return Pipeable
      * @see sort
      */
     public function sortBy(callable $mappingFunction);
 
     /**
-     * Transforms this enumerable into an array.
+     * Transforms this pipeable into an array.
      * @param bool $preserveKeys indicates if the keys should be preserved or if values should be re-indexed (Has no effect for vectors).
      * @return array
      */
     public function toArray($preserveKeys = true);
 
     /**
-     * Returns this enumerable as a traversable collection.
+     * Returns this pipeable as a traversable collection.
      * <p>This function is primarily a workaround to the inability of traits to implement interfaces.
-     * Because all classes implementing Enumerable should also implement {@link Traversable},
+     * Because all classes implementing Pipeable should also implement {@link Traversable},
      * most implementation simply return <code>$this</code>.</p>
      * @return Traversable
      */

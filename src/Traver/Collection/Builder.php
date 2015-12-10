@@ -27,7 +27,7 @@ interface Builder
     public function addAll($array, $preserveKeys = true);
 
     /**
-     * @return Enumerable
+     * @return Pipeable
      */
     public function build();
 }

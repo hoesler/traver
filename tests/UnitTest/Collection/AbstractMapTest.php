@@ -9,7 +9,7 @@ use PhpOption\Some;
 use Traver\Callback\Comparators;
 use Traver\Callback\OperatorCallbacks;
 
-abstract class AbstractMapTest extends AbstractEnumerableTest
+abstract class AbstractMapTest extends AbstractPipeableTest
 {
     public function toArrayProvider()
     {

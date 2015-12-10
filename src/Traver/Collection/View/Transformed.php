@@ -1,9 +1,9 @@
 <?php
 namespace Traver\Collection\View;
 
-use Traver\Collection\Enumerable;
-use Traver\Collection\EnumerableView;
-use Traver\Collection\EnumerableViewLike;
+use Traver\Collection\Pipeable;
+use Traver\Collection\PipeableView;
+use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\ReindexingIterator;
 use Traver\Iterator\TransformingIterator;
 
@@ -13,9 +13,9 @@ use Traver\Iterator\TransformingIterator;
  * @codeCoverageIgnore
  * @internal
  */
-class Transformed implements \IteratorAggregate, Enumerable
+class Transformed implements \IteratorAggregate, Pipeable
 {
-    use EnumerableView;
+    use PipeableView;
 
     /**
      * @var callable
@@ -25,7 +25,7 @@ class Transformed implements \IteratorAggregate, Enumerable
 
     /**
      * MapView constructor.
-     * @param EnumerableViewLike $delegate
+     * @param PipeableViewLike $delegate
      * @param callable $mappingFunction
      */
     public function __construct($delegate, $mappingFunction)
