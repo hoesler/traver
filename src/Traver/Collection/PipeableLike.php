@@ -344,7 +344,7 @@ trait PipeableLike
     }
 
     /**
-     * Concatenates the strval of all elements separated by the given separator.
+     * Concatenates the {@link strval} of all elements separated by the given separator.
      * @param $separator
      * @return mixed
      * @see Pipeable::join
