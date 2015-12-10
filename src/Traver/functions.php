@@ -3,9 +3,9 @@
 namespace Traver;
 
 use Traver\Callback\OperatorCallbacks;
-use Traver\Enumerable\Enumerable;
-use Traver\Enumerable\ImmutableMap;
-use Traver\Enumerable\ImmutableVector;
+use Traver\Collection\Enumerable;
+use Traver\Collection\ImmutableMap;
+use Traver\Collection\ImmutableVector;
 use Traversable;
 
 if (!function_exists('Traver\view')) {

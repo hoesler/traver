@@ -3,7 +3,7 @@
 namespace Traver\Test\UnitTest;
 
 use PHPUnit_Framework_TestCase;
-use Traver\Enumerable\Enumerable;
+use Traver\Collection\Enumerable;
 
 class FunctionsTest extends PHPUnit_Framework_TestCase
 {
