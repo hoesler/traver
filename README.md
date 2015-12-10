@@ -2,6 +2,7 @@
 
 A PHP library which provides collection classes implementing the [pipeline pattern](http://martinfowler.com/articles/collection-pipeline).
 
+[![Build Status](https://img.shields.io/travis/hoesler/traver/master.svg?style=flat-square)](https://travis-ci.org/PHP-DI/PHP-DI)
 
 PHP has only limited support for object oriented collections and none implements the pipeline pattern, which is available in many modern languages like Hack, Ruby, Scala or Clojure. All existing libraries I found on the web didn't satisfy me, but served as an inspiration: [functional-php](https://github.com/lstrojny/functional-php), [fluent-traversable](https://github.com/psliwa/fluent-traversable) or [immutable.php](https://github.com/jkoudys/immutable.php).
 
