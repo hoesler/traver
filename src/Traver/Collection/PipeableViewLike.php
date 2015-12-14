@@ -126,6 +126,12 @@ trait PipeableViewLike
         return $this->newCollection($sorted->asTraversable());
     }
 
+    public function flatten($level = -1)
+    {
+        return new View\Flattened($this, $level);
+    }
+
+
     final public function asTraversable()
     {
         return $this->getIterator();

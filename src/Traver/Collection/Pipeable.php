@@ -223,6 +223,13 @@ interface Pipeable extends \Traversable, \Countable
      */
     public function sortBy(callable $mappingFunction);
 
+
+    /**
+     * @param $level
+     * @return Pipeable
+     */
+    public function flatten($level = -1);
+
     /**
      * Transforms this pipeable into an array.
      * @param bool $preserveKeys indicates if the keys should be preserved or if values should be re-indexed (Has no effect for vectors).

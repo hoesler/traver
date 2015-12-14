@@ -37,10 +37,6 @@ class ImmutableVector implements \IteratorAggregate, Collection
         return new self(\SplFixedArray::fromArray($array, $save_indexes));
     }
 
-    function __clone()
-    {
-    }
-
     /**
      * @return Iterator
      */
@@ -70,6 +66,10 @@ class ImmutableVector implements \IteratorAggregate, Collection
     public function isVectorLike()
     {
         return true;
+    }
+
+    private function __clone()
+    {
     }
 }
 

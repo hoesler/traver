@@ -428,4 +428,12 @@ abstract class AbstractMapTest extends AbstractPipeableTest
             ]
         ];
     }
+
+    public function flattenProvider()
+    {
+        return [
+            [["a" => 1, "b" => ["a" => 2, "c" => ["d" => 3]]], [1, 2, 3]],
+            [[1, 2, [3, [4, 5]]], [1, 2, 3, [4, 5]], 1]
+        ];
+    }
 }

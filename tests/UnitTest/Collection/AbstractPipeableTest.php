@@ -732,5 +732,29 @@ abstract class AbstractPipeableTest extends PHPUnit_Framework_TestCase
         PHPUnit_Framework_Assert::assertEquals($array, iterator_to_array($traversable));
     }
 
+    /**
+     * @dataProvider flattenProvider
+     * @covers ::flatten
+     * @param $array
+     * @param $expected
+     * @param ...$args
+     */
+    public function testFlatten($array, $expected, ...$args)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $flattened = $enumerable->flatten(...$args);
+
+        // then
+        PHPUnit_Framework_Assert::assertInstanceOf(Pipeable::class, $flattened);
+        PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($flattened));
+    }
+
+    abstract public function flattenProvider();
+
     abstract public function asTraversableProvider();
 }
