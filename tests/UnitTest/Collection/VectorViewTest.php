@@ -9,6 +9,11 @@ use Traver\Collection\FromArrayBuilder;
 use Traver\Collection\ImmutableVector;
 use Traver\Collection\PipeableView;
 
+/**
+ * Class VectorViewTest
+ * @package Traver\Test\UnitTest\Collection
+ * @coversDefaultClass \Traver\Collection\PipeableView
+ */
 class VectorViewTest extends AbstractVectorTest
 {
     /**
