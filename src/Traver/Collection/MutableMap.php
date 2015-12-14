@@ -4,7 +4,7 @@
 namespace Traver\Collection;
 
 
-class MutableMap implements \IteratorAggregate, Collection
+class MutableMap implements \IteratorAggregate, Map
 {
     use PipeableLike;
     use ForwardingArrayAccess;
@@ -25,14 +25,6 @@ class MutableMap implements \IteratorAggregate, Collection
     /**
      * @inheritDoc
      */
-    public function asTraversable()
-    {
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function builder()
     {
         return new MutableMapBuilder();
@@ -43,7 +35,7 @@ class MutableMap implements \IteratorAggregate, Collection
      */
     public function getIterator()
     {
-        return $this->delegate()->getIterator();
+        return $this->delegate->getIterator();
     }
 
     /**

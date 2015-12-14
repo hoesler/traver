@@ -5,14 +5,13 @@ namespace Traver\Collection\View;
 
 
 use Traver\Collection\Pipeable;
-use Traver\Collection\PipeableView;
 use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\RecursiveTraversableIterator;
 use Traver\Iterator\ReindexingIterator;
 
 class Flattened implements \IteratorAggregate, Pipeable
 {
-    use PipeableView;
+    use PipeableViewLike;
 
     /**
      * @var PipeableViewLike

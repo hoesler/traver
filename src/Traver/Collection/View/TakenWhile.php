@@ -2,7 +2,6 @@
 namespace Traver\Collection\View;
 
 use Traver\Collection\Pipeable;
-use Traver\Collection\PipeableView;
 use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\CallbackLimitIterator;
 use Traver\Iterator\ReindexingIterator;
@@ -15,7 +14,7 @@ use Traver\Iterator\ReindexingIterator;
  */
 class TakenWhile implements \IteratorAggregate, Pipeable
 {
-    use PipeableView;
+    use PipeableViewLike;
 
     /**
      * @var callable

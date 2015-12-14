@@ -4,25 +4,36 @@
 namespace Traver\Collection;
 
 
-trait PipeableView
+class PipeableView implements \IteratorAggregate, Pipeable
 {
     use PipeableViewLike;
 
-    public function isVectorLike()
+    /**
+     * @var Pipeable
+     */
+    private $delegate;
+
+    /**
+     * PipeableView constructor.
+     * @param Pipeable $delegate
+     */
+    public function __construct($delegate)
     {
-        return $this->delegate()->isVectorLike();
+        $this->delegate = $delegate;
     }
 
-    /**
-     * @return PipeableViewLike
-     */
-    abstract protected function delegate();
-
-    /**
-     * @codeCoverageIgnore
-     */
-    final protected function builder()
+    function getIterator()
     {
-        return $this->delegate()->builder();
+        return $this->delegate()->getIterator();
+    }
+
+    protected function delegate()
+    {
+        return $this->delegate;
+    }
+
+    protected function asPipeable()
+    {
+        return $this;
     }
 }

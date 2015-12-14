@@ -6,8 +6,10 @@ namespace Traver\Test\UnitTest\Collection;
 
 use PhpOption\None;
 use PhpOption\Some;
+use PHPUnit_Framework_Assert;
 use Traver\Callback\Comparators;
 use Traver\Callback\OperatorCallbacks;
+use Traver\Collection\Pipeable;
 
 abstract class AbstractVectorTest extends AbstractPipeableTest
 {
@@ -424,6 +426,29 @@ abstract class AbstractVectorTest extends AbstractPipeableTest
                 ["a", "aa", "aaa", "aaaa"]
             ]
         ];
+    }
+
+    /**
+     * @dataProvider flattenProvider
+     * @covers ::flatten
+     * @param $array
+     * @param $expected
+     * @param ...$args
+     */
+    public function testFlatten($array, $expected, ...$args)
+    {
+        // given
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        /** @noinspection PhpUndefinedMethodInspection */
+        $flattened = $enumerable->flatten(...$args);
+
+        // then
+        PHPUnit_Framework_Assert::assertInstanceOf(Pipeable::class, $flattened);
+        PHPUnit_Framework_Assert::assertEquals($expected, iterator_to_array($flattened));
     }
 
     public function flattenProvider()

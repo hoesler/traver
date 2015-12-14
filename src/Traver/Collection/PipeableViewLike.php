@@ -4,7 +4,6 @@
 namespace Traver\Collection;
 
 
-use Iterator;
 use Traver\Exception\UnsupportedOperationException;
 
 trait PipeableViewLike
@@ -102,28 +101,36 @@ trait PipeableViewLike
     public function groupBy(callable $keyFunction)
     {
         $keyFunction = self::wrapCallback($keyFunction);
-        $mutableCopy = $this->mutableCopy();
-        $grouped = $mutableCopy->groupBy($keyFunction);
+        $forced = $this->force();
+        $grouped = $forced->groupBy($keyFunction);
 
         return $grouped->map(function ($group) {
-            return $this->newCollection($group);
-        });
+            return $this->delegate()->builder()->addAll($group)->build();
+        })->view();
     }
+
+    public function force()
+    {
+        return $this->delegate()->builder()->addAll($this->asTraversable())->build();
+    }
+
+    /**
+     * @return Pipeable
+     */
+    abstract protected function delegate();
 
     public function sort(callable $compareFunction = null)
     {
-        $mutableCopy = $this->mutableCopy();
-        $sorted = $mutableCopy->sort($compareFunction);
-
-        return $this->newCollection($sorted->asTraversable());
+        $forced = $this->force();
+        $sorted = $forced->sort($compareFunction);
+        return $sorted->view();
     }
 
     public function sortBy(callable $mappingFunction)
     {
-        $mutableCopy = $this->mutableCopy();
-        $sorted = $mutableCopy->sortBy($mappingFunction);
-
-        return $this->newCollection($sorted->asTraversable());
+        $forced = $this->force();
+        $sorted = $forced->sortBy($mappingFunction);
+        return $sorted->view();
     }
 
     public function flatten($level = -1)
@@ -131,14 +138,21 @@ trait PipeableViewLike
         return new View\Flattened($this, $level);
     }
 
-
-    final public function asTraversable()
+    public function isVectorLike()
     {
-        return $this->getIterator();
+        return $this->delegate()->isVectorLike();
+    }
+
+    public function view()
+    {
+        return $this;
     }
 
     /**
-     * @return Iterator
+     * @return Builder
      */
-    abstract function getIterator();
+    final public function builder()
+    {
+        throw new UnsupportedOperationException("Views do not have a builder.");
+    }
 }

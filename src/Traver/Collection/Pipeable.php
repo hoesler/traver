@@ -3,6 +3,7 @@
 namespace Traver\Collection;
 
 
+use Iterator;
 use PhpOption\Option;
 use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
@@ -223,13 +224,6 @@ interface Pipeable extends \Traversable, \Countable
      */
     public function sortBy(callable $mappingFunction);
 
-
-    /**
-     * @param $level
-     * @return Pipeable
-     */
-    public function flatten($level = -1);
-
     /**
      * Transforms this pipeable into an array.
      * @param bool $preserveKeys indicates if the keys should be preserved or if values should be re-indexed (Has no effect for vectors).
@@ -245,4 +239,31 @@ interface Pipeable extends \Traversable, \Countable
      * @return Traversable
      */
     public function asTraversable();
+
+    /**
+     * @return Iterator
+     */
+    public function getIterator();
+
+    /**
+     * Returns a new pipeable, whose methods compute values lazily.
+     * @return Pipeable
+     */
+    public function view();
+
+    /**
+     * Returns a new pipeable, whose methods compute values directly.
+     * @return Pipeable
+     */
+    public function force();
+
+    /**
+     * @return Builder
+     */
+    public function builder();
+
+    /**
+     * @return bool
+     */
+    public function isVectorLike();
 }

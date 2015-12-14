@@ -2,7 +2,6 @@
 namespace Traver\Collection\View;
 
 use Traver\Collection\Pipeable;
-use Traver\Collection\PipeableView;
 use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\ReindexingIterator;
 use Traver\Iterator\TransformingIterator;
@@ -15,7 +14,7 @@ use Traver\Iterator\TransformingIterator;
  */
 class Transformed implements \IteratorAggregate, Pipeable
 {
-    use PipeableView;
+    use PipeableViewLike;
 
     /**
      * @var callable

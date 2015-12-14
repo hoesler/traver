@@ -3,7 +3,6 @@ namespace Traver\Collection\View;
 
 use CallbackFilterIterator;
 use Traver\Collection\Pipeable;
-use Traver\Collection\PipeableView;
 use Traver\Collection\PipeableViewLike;
 use Traver\Iterator\ReindexingIterator;
 
@@ -15,7 +14,7 @@ use Traver\Iterator\ReindexingIterator;
  */
 class Filtered implements \IteratorAggregate, Pipeable
 {
-    use PipeableView;
+    use PipeableViewLike;
 
     /**
      * @var callable

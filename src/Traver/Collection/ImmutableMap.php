@@ -6,10 +6,11 @@ namespace Traver\Collection;
 
 use ArrayObject;
 use Iterator;
+use Traversable;
 
-class ImmutableMap implements \IteratorAggregate, Collection
+class ImmutableMap implements \IteratorAggregate, Map
 {
-    use PipeableViewLike;
+    use PipeableLike;
     use ImmutableArrayAccess;
 
     /**

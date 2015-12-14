@@ -13,9 +13,9 @@ use SplFixedArray;
  * This class implements {@link \Traver\Collection\Collection} using an SplFixedArray.
  * @package Traver\Collection
  */
-class ImmutableVector implements \IteratorAggregate, Collection
+class ImmutableVector implements \IteratorAggregate, Vector
 {
-    use PipeableViewLike;
+    use VectorLike;
     use ImmutableArrayAccess;
 
     /**

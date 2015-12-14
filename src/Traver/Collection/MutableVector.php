@@ -7,9 +7,9 @@ namespace Traver\Collection;
 use Iterator;
 use SplFixedArray;
 
-class MutableVector implements \IteratorAggregate, Collection
+class MutableVector implements \IteratorAggregate, Vector
 {
-    use PipeableLike;
+    use VectorLike;
     use ForwardingArrayAccess;
 
     /**
@@ -38,14 +38,6 @@ class MutableVector implements \IteratorAggregate, Collection
             $this->delegate->setSize($this->delegate->getSize() << 1);
         }
         $this->delegate->offsetSet($offset, $value);
-    }
-
-    /**
-     * @return Iterator
-     */
-    function asTraversable()
-    {
-        return $this->delegate;
     }
 
     /**

@@ -4,6 +4,7 @@
 namespace Traver\Collection;
 
 
+use Iterator;
 use PhpOption\None;
 use PhpOption\Option;
 use PhpOption\Some;
@@ -42,7 +43,15 @@ trait PipeableLike
      * Implements {@link Pipeable::asTraversable}.
      * @return Traversable
      */
-    abstract public function asTraversable();
+    final public function asTraversable()
+    {
+        return $this->getIterator();
+    }
+
+    /**
+     * @return Iterator
+     */
+    abstract public function getIterator();
 
     /**
      * Implements {@link Pipeable::tail}.
@@ -105,6 +114,7 @@ trait PipeableLike
     }
 
     /**
+     * Implements {@link Pipeable::builder}.
      * Creates a new Builder for the current class implementing Pipeable.
      * @return Builder
      */
@@ -536,54 +546,30 @@ trait PipeableLike
     }
 
     /**
-     * Implements {@link Pipable::flatten}.
-     * @param int $level
-     * @return PipeableLike
+     * Implements {@link Pipeable::view}.
+     * @return PipeableView
      */
-    public function flatten($level = -1)
+    public function view()
     {
-        $builder = $this->builder();
-        $this->flattenRecursive($this->asTraversable(), $level, $builder);
-        return $builder->build();
-    }
-
-    /**
-     * @param array|Traversable $traversable
-     * @param $level
-     * @param Builder $builder
-     */
-    private function flattenRecursive($traversable, $level, &$builder)
-    {
-        if ($level == 0) {
-            $builder->addAll($traversable, false);
-            return;
-        }
-
-        foreach ($traversable as $value) {
-            if ($value instanceof Traversable || is_array($value)) {
-                $this->flattenRecursive($value, $level - 1, $builder);
-            } else {
-                $builder->add($value);
-            }
-        }
+        return new PipeableView($this->asPipeable());
     }
 
     /**
      * @return Pipeable
      */
-    protected final function mutableCopy()
+    protected function asPipeable()
     {
-        if ($this->isVectorLike()) {
-            return new MutableVector($this->toArray());
-        } else {
-            return new MutableMap($this->toArray());
+        if (!$this instanceof Pipeable) {
+            throw new \RuntimeException("Classes using trait PipeableLike must implement interface Pipeable.");
         }
+        return $this;
     }
 
     /**
-     * Tests if the collection is vector like. The result is used to control preservation of keys.
-     * @return mixed
+     * @return Pipeable
      */
-    abstract public function isVectorLike();
-
+    public function force()
+    {
+        return $this;
+    }
 }
