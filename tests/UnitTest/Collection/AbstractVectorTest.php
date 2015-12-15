@@ -13,6 +13,21 @@ use Traver\Collection\Pipeable;
 
 abstract class AbstractVectorTest extends AbstractPipeableTest
 {
+    /**
+     * @covers ::isVectorLike
+     */
+    public function testIsVectorLike()
+    {
+        // given
+        $builder = $this->createBuilder();
+        $enumerable = $builder->build();
+
+        // when
+        $isVectorLike = $enumerable->isVectorLike();
+
+        // then
+        self::assertTrue($isVectorLike);
+    }
 
     public function asTraversableProvider()
     {

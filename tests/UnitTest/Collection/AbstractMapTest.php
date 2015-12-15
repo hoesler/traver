@@ -11,6 +11,22 @@ use Traver\Callback\OperatorCallbacks;
 
 abstract class AbstractMapTest extends AbstractPipeableTest
 {
+    /**
+     * @covers ::isVectorLike
+     */
+    public function testIsVectorLike()
+    {
+        // given
+        $builder = $this->createBuilder();
+        $enumerable = $builder->build();
+
+        // when
+        $isVectorLike = $enumerable->isVectorLike();
+
+        // then
+        self::assertFalse($isVectorLike);
+    }
+
     public function toArrayProvider()
     {
         return [

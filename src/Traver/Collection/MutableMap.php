@@ -6,7 +6,7 @@ namespace Traver\Collection;
 
 class MutableMap implements \IteratorAggregate, Map
 {
-    use PipeableLike;
+    use MapLike;
     use ForwardingArrayAccess;
 
     /**
@@ -22,33 +22,22 @@ class MutableMap implements \IteratorAggregate, Map
         $this->delegate = new \ArrayObject($input);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function builder()
     {
         return new MutableMapBuilder();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getIterator()
     {
         return $this->delegate->getIterator();
     }
 
     /**
-     * @inheritDoc
+     * @codeCoverageIgnore
      */
-    function delegate()
+    protected function delegate()
     {
         return $this->delegate;
-    }
-
-    public function isVectorLike()
-    {
-        return false;
     }
 }
 

@@ -5,6 +5,7 @@ namespace Traver\Test\UnitTest\Collection;
 
 
 use Traver\Collection\MutableVector;
+use Traver\Collection\MutableVectorBuilder;
 
 /**
  * Class MutableVectorTest
@@ -16,6 +17,21 @@ class MutableVectorTest extends AbstractVectorTest
     use MutabilityTest;
 
     /**
+     * @covers ::builder
+     */
+    public function testBuilder()
+    {
+        // given
+        $mutableVector = new MutableVector();
+
+        // when
+        $builder = $mutableVector->builder();
+
+        // then
+        self::assertInstanceOf(MutableVectorBuilder::class, $builder);
+    }
+
+    /**
      * @return \Traver\Collection\Builder
      */
     protected function createBuilder()
@@ -23,4 +39,6 @@ class MutableVectorTest extends AbstractVectorTest
         $mutableVector = new MutableVector();
         return $mutableVector->builder();
     }
+
+
 }

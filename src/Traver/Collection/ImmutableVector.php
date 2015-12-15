@@ -4,8 +4,8 @@
 namespace Traver\Collection;
 
 
-use Iterator;
 use SplFixedArray;
+use Traversable;
 
 /**
  * Class ImmutableVector
@@ -16,7 +16,12 @@ use SplFixedArray;
 class ImmutableVector implements \IteratorAggregate, Vector
 {
     use VectorLike;
-    use ImmutableArrayAccess;
+    use ForwardingArrayAccess;
+    use ImmutableCollection {
+        ImmutableCollection::offsetSet insteadof ForwardingArrayAccess;
+        ImmutableCollection::offsetUnset insteadof ForwardingArrayAccess;
+        ImmutableCollection::count insteadof VectorLike;
+    }
 
     /**
      * @var SplFixedArray
@@ -26,29 +31,39 @@ class ImmutableVector implements \IteratorAggregate, Vector
     /**
      * ImmutableVector constructor.
      * @param SplFixedArray $delegate
+     * @codeCoverageIgnore
      */
     private function __construct($delegate)
     {
         $this->delegate = $delegate;
     }
 
-    public static function fromArray($array, $save_indexes = true)
+    /**
+     * Create a new ImmutableVector from the given elements.
+     * @param ...$elements
+     * @return ImmutableVector
+     */
+    public static function of(...$elements)
     {
-        return new self(\SplFixedArray::fromArray($array, $save_indexes));
+        return new self(\SplFixedArray::fromArray($elements));
     }
 
     /**
-     * @return Iterator
+     * Create a new ImmutableVector from the given traversable.
+     * @param array|Traversable $traversable
+     * @param bool $preserveKeys
+     * @return ImmutableVector
      */
-    function getIterator()
+    public static function copyOf($traversable, $preserveKeys = true)
     {
-        return $this->delegate;
+        if (is_array($traversable)) {
+            return new self(\SplFixedArray::fromArray($traversable, $preserveKeys));
+        } else {
+            return new self(\SplFixedArray::fromArray(iterator_to_array($traversable), $preserveKeys));
+        }
     }
 
-    /**
-     * @return \Traversable|\ArrayAccess|\Countable
-     */
-    function delegate()
+    public function getIterator()
     {
         return $this->delegate;
     }
@@ -63,9 +78,17 @@ class ImmutableVector implements \IteratorAggregate, Vector
         return new ImmutableVectorBuilder();
     }
 
-    public function isVectorLike()
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function delegate()
     {
-        return true;
+        return $this->delegate;
+    }
+
+    protected function getSize()
+    {
+        return $this->delegate->count();
     }
 
     private function __clone()
@@ -79,12 +102,9 @@ class ImmutableVectorBuilder implements Builder
 
     public function build()
     {
-        return ImmutableVector::fromArray($this->array);
+        return ImmutableVector::copyOf($this->array);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function add($element, $key = null)
     {
         array_push($this->array, $element);

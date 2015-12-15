@@ -31,6 +31,6 @@ class VectorViewBuilder implements Builder
 
     public function build()
     {
-        return new PipeableView(ImmutableVector::fromArray($this->array));
+        return new PipeableView(ImmutableVector::copyOf($this->array));
     }
 }

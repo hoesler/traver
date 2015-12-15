@@ -106,7 +106,7 @@ trait PipeableViewLike
 
         return $grouped->map(function ($group) {
             return $this->delegate()->builder()->addAll($group)->build();
-        })->view();
+        });
     }
 
     public function force()
@@ -123,14 +123,14 @@ trait PipeableViewLike
     {
         $forced = $this->force();
         $sorted = $forced->sort($compareFunction);
-        return $sorted->view();
+        return $sorted;
     }
 
     public function sortBy(callable $mappingFunction)
     {
         $forced = $this->force();
         $sorted = $forced->sortBy($mappingFunction);
-        return $sorted->view();
+        return $sorted;
     }
 
     public function flatten($level = -1)
@@ -148,9 +148,6 @@ trait PipeableViewLike
         return $this;
     }
 
-    /**
-     * @return Builder
-     */
     final public function builder()
     {
         throw new UnsupportedOperationException("Views do not have a builder.");

@@ -48,14 +48,6 @@ class MutableVector implements \IteratorAggregate, Vector
         return $this->delegate;
     }
 
-    /**
-     * @return \Traversable|\ArrayAccess|\Countable
-     */
-    function delegate()
-    {
-        return $this->delegate;
-    }
-
     public function builder()
     {
         return new MutableVectorBuilder();
@@ -64,6 +56,14 @@ class MutableVector implements \IteratorAggregate, Vector
     public function isVectorLike()
     {
         return true;
+    }
+
+    /**
+     * @return \Traversable|\ArrayAccess|\Countable
+     */
+    protected function delegate()
+    {
+        return $this->delegate;
     }
 }
 

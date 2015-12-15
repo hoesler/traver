@@ -17,7 +17,7 @@ trait ForwardingArrayAccess
     /**
      * @return \ArrayAccess
      */
-    abstract function delegate();
+    abstract protected function delegate();
 
     /**
      * @inheritDoc

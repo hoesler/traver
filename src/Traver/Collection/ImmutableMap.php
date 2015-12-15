@@ -5,13 +5,17 @@ namespace Traver\Collection;
 
 
 use ArrayObject;
-use Iterator;
 use Traversable;
 
 class ImmutableMap implements \IteratorAggregate, Map
 {
-    use PipeableLike;
-    use ImmutableArrayAccess;
+    use MapLike;
+    use ForwardingArrayAccess;
+    use ImmutableCollection {
+        ImmutableCollection::offsetSet insteadof ForwardingArrayAccess;
+        ImmutableCollection::offsetUnset insteadof ForwardingArrayAccess;
+        ImmutableCollection::count insteadof MapLike;
+    }
 
     /**
      * @var ArrayObject
@@ -21,6 +25,7 @@ class ImmutableMap implements \IteratorAggregate, Map
     /**
      * ImmutableVector constructor.
      * @param ArrayObject $delegate
+     * @codeCoverageIgnore
      */
     private function __construct($delegate)
     {
@@ -28,35 +33,27 @@ class ImmutableMap implements \IteratorAggregate, Map
     }
 
     /**
-     * @param array $array
+     * Create a new ImmutableMap from the given elements.
+     * @param ...$elements
      * @return ImmutableMap
      */
-    public static function fromArray(array $array)
+    public static function of(...$elements)
     {
-        return new self(new \ArrayObject($array));
+        return new self(new ArrayObject($elements));
     }
 
     /**
-     * @inheritDoc
+     * @param array|Traversable $traversable
+     * @return ImmutableMap
      */
-    function __clone()
+    public static function copyOf($traversable)
     {
+        return new self(new ArrayObject($traversable));
     }
 
-    /**
-     * @return Iterator
-     */
-    function getIterator()
+    public function getIterator()
     {
         return $this->delegate->getIterator();
-    }
-
-    /**
-     * @return \Traversable|\ArrayAccess|\Countable
-     */
-    function delegate()
-    {
-        return $this->delegate;
     }
 
     public function builder()
@@ -69,21 +66,37 @@ class ImmutableMap implements \IteratorAggregate, Map
         return new ImmutableMapBuilder();
     }
 
-    public function isVectorLike()
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function delegate()
     {
-        return false;
+        return $this->delegate;
+    }
+
+    protected function getSize()
+    {
+        return $this->delegate->count();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    private function __clone()
+    {
     }
 }
 
+/**
+ * Class ImmutableMapBuilder
+ * @package Traver\Collection
+ */
 class ImmutableMapBuilder implements Builder
 {
     use FromArrayBuilder;
 
-    /**
-     * @inheritDoc
-     */
     public function build()
     {
-        return ImmutableMap::fromArray($this->array);
+        return ImmutableMap::copyOf($this->array);
     }
 }

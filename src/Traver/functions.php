@@ -16,11 +16,11 @@ if (!function_exists('Traver\view')) {
     function view($collection)
     {
         if (is_array($collection)) {
-            return ImmutableMap::fromArray($collection);
+            return ImmutableMap::copyOf($collection);
         } elseif (is_a($collection, ImmutableMap::class) || is_a($collection, ImmutableVector::class)) {
             return $collection;
         } else {
-            return ImmutableMap::fromArray(iterator_to_array($collection));
+            return ImmutableMap::copyOf(iterator_to_array($collection));
         }
     }
 }

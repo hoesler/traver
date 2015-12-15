@@ -8,8 +8,6 @@ use Traver\Exception\UnsupportedOperationException;
 
 trait ImmutableArrayAccess
 {
-    use ForwardingArrayAccess;
-
     final public function offsetSet(/** @noinspection PhpUnusedParameterInspection */
         $offset, $value)
     {

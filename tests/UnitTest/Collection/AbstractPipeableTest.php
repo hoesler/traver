@@ -733,4 +733,23 @@ abstract class AbstractPipeableTest extends PHPUnit_Framework_TestCase
     }
 
     abstract public function asTraversableProvider();
+    
+    /**
+     * @covers ::getIterator
+     */
+    public function testGetIterator()
+    {
+        // given
+        $array = [1, 2, 3];
+        $builder = $this->createBuilder();
+        $builder->addAll($array);
+        $enumerable = $builder->build();
+
+        // when
+        $iterator = $enumerable->getIterator();
+
+        // then
+        self::assertInstanceOf(\Iterator::class, $iterator);
+        self::assertEquals($array, iterator_to_array($iterator));
+    }
 }

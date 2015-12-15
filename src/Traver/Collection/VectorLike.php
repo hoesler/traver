@@ -10,6 +10,11 @@ trait VectorLike
 {
     use PipeableLike;
 
+    public function isVectorLike()
+    {
+        return true;
+    }
+
     /**
      * Implements {@link Pipable::flatten}.
      * @param int $level
@@ -23,6 +28,7 @@ trait VectorLike
     }
 
     /**
+     * @codeCoverageIgnore
      * @param array|Traversable $traversable
      * @param $level
      * @param Builder $builder
