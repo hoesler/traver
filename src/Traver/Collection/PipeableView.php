@@ -3,7 +3,10 @@
 
 namespace Traver\Collection;
 
-
+/**
+ * Class PipeableView
+ * @package Traver\Collection
+ */
 class PipeableView implements \IteratorAggregate, Pipeable
 {
     use PipeableViewLike;

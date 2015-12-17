@@ -6,6 +6,10 @@ namespace Traver\Collection;
 
 use Traver\Exception\UnsupportedOperationException;
 
+/**
+ * Class PipeableViewLike is used to implement a lazy version of {@link Pipeable}.
+ * @package Traver\Collection
+ */
 trait PipeableViewLike
 {
     use PipeableLike;

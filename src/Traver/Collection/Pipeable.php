@@ -9,6 +9,10 @@ use Traver\Exception\NoSuchElementException;
 use Traver\Exception\UnsupportedOperationException;
 use Traversable;
 
+/**
+ * Interface Pipeable
+ * @package Traver\Collection
+ */
 interface Pipeable extends \Traversable, \Countable
 {
     /**

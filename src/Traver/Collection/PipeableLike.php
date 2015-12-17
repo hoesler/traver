@@ -15,9 +15,8 @@ use Traver\Exception\UnsupportedOperationException;
 use Traversable;
 
 /**
- * Class PipeableLike
+ * Trait PipeableLike is used to implement {@link Pipeable}.
  * @package Traver\Collection
- * @implements Pipeable
  */
 trait PipeableLike
 {
@@ -118,7 +117,7 @@ trait PipeableLike
      * Creates a new Builder for the current class implementing Pipeable.
      * @return Builder
      */
-    abstract protected function builder();
+    abstract public function builder();
 
     /**
      * Implements {@link Pipeable::count}.
