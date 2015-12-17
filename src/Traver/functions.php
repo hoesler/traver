@@ -5,85 +5,85 @@ namespace Traver;
 use Traver\Callback\OperatorCallbacks;
 use Traver\Collection\ImmutableMap;
 use Traver\Collection\ImmutableVector;
-use Traver\Collection\Pipeable;
+use Traver\Collection\MutableMap;
+use Traver\Collection\MutableVector;
+use Traver\Collection\Range;
 use Traversable;
 
-if (!function_exists('Traver\view')) {
+if (!function_exists('Traver\map')) {
     /**
-     * @param array|Traversable $collection
-     * @return Pipeable
+     * Creates a new {@link ImmutableMap} from the given elements.
+     * @param array|Traversable $elements
+     * @return ImmutableMap
+     * @see in alias
      */
-    function view($collection)
+    function map($elements = [])
     {
-        if (is_array($collection)) {
-            return ImmutableMap::copyOf($collection);
-        } elseif (is_a($collection, ImmutableMap::class) || is_a($collection, ImmutableVector::class)) {
-            return $collection;
-        } else {
-            return ImmutableMap::copyOf(iterator_to_array($collection));
-        }
+        return ImmutableMap::copyOf($elements);
+    }
+}
+
+if (!function_exists('Traver\mutable_map')) {
+    /**
+     * Creates a new {@link MutableMap} from the given elements.
+     * @param array|Traversable $elements
+     * @return ImmutableMap
+     * @see in alias
+     */
+    function mutable_map($elements = [])
+    {
+        return new MutableMap($elements);
+    }
+}
+
+if (!function_exists('Traver\vector')) {
+    /**
+     * Creates a new {@link ImmutableVector} from the given elements.
+     * @param mixed ...$elements
+     * @return ImmutableVector
+     */
+    function vector($elements = [])
+    {
+        return ImmutableVector::copyOf($elements);
+    }
+}
+
+if (!function_exists('Traver\mutable_vector')) {
+    /**
+     * Creates a new {@link MutableVector} from the given elements.
+     * @param mixed ...$elements
+     * @return ImmutableVector
+     */
+    function mutable_vector($elements = [])
+    {
+        return new MutableVector($elements);
     }
 }
 
 if (!function_exists('Traver\in')) {
     /**
+     * Creates a new {@link ImmutableMap} from the given elements.
      * @param array|Traversable $collection
-     * @return Pipeable
+     * @return ImmutableMap
+     * @see map alias
      */
     function in($collection)
     {
-        return view($collection);
+        return ImmutableMap::copyOf($collection);
     }
 }
 
-if (!function_exists('Traver\head')) {
+if (!function_exists('Traver\range')) {
     /**
-     * @param array|Traversable $collection
-     * @return mixed
+     * Creates a new {@link \Traver\Collection\Range Range} from the given elements.
+     * @param $start
+     * @param $end
+     * @param bool $exclusive
+     * @return Collection\Range
      */
-    function head($collection)
+    function range($start, $end, $exclusive = false)
     {
-        return view($collection)->head();
-    }
-}
-
-if (!function_exists('Traver\tail')) {
-    /**
-     * @param array|Traversable $collection
-     * @return array
-     */
-    function tail($collection)
-    {
-        return view($collection)->tail()->toArray();
-    }
-}
-
-if (!function_exists('Traver\map')) {
-    /**
-     * @param array|Traversable $collection
-     * @param callable $mappingFunction
-     * @return array
-     */
-    function map($collection, callable $mappingFunction)
-    {
-        return view($collection)->map($mappingFunction)->toArray();
-    }
-}
-
-if (!function_exists('Traver\reduce')) {
-    /**
-     * @param array|Traversable $collection
-     * @param callback $binaryFunction
-     * @param null $initial
-     * @return array
-     */
-    function reduce($collection, $binaryFunction, $initial = null)
-    {
-        if (func_num_args() == 1) {
-            return view($collection)->reduce($binaryFunction);
-        } else {
-            return view($collection)->reduce($binaryFunction, $initial);
-        }
+        return new Range($start, $end, $exclusive);
     }
 }
 

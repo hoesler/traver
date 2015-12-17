@@ -3,32 +3,108 @@
 namespace Traver\Test\UnitTest;
 
 use PHPUnit_Framework_TestCase;
-use Traver\Collection\Pipeable;
+use Traver\Collection\ImmutableMap;
+use Traver\Collection\ImmutableVector;
+use Traver\Collection\MutableMap;
+use Traver\Collection\MutableVector;
 
 class FunctionsTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider viewProvider
-     * @covers ::\Traver\view
+     * @dataProvider hashProvider
+     * @covers ::\Traver\hash
      * @param $input
      */
-    public function testView($input)
+    public function testHash($input)
     {
         // given
         $array = $input;
 
         // when
-        $view = \Traver\view($array);
+        $view = \Traver\map($array);
 
         // then
-        self::assertInstanceOf(Pipeable::class, $view);
+        self::assertInstanceOf(ImmutableMap::class, $view);
     }
 
-    public function viewProvider()
+    public function hashProvider()
     {
         return [
             [["a", "b", "c"]],
-            [new \ArrayObject(["a", "b", "c"])]
+            [["a" => 1, "b" => 2, "c" => 3]]
+        ];
+    }
+
+    /**
+     * @dataProvider mutableHashProvider
+     * @covers ::\Traver\mutable_hash
+     * @param $input
+     */
+    public function testMutableHash($input)
+    {
+        // given
+        $array = $input;
+
+        // when
+        $view = \Traver\mutable_map($array);
+
+        // then
+        self::assertInstanceOf(MutableMap::class, $view);
+    }
+
+    public function mutableHashProvider()
+    {
+        return [
+            [["a", "b", "c"]],
+            [["a" => 1, "b" => 2, "c" => 3]]
+        ];
+    }
+
+    /**
+     * @dataProvider vectorProvider
+     * @covers ::\Traver\hash
+     * @param $input
+     */
+    public function testVector($input)
+    {
+        // given
+        $array = $input;
+
+        // when
+        $view = \Traver\vector($array);
+
+        // then
+        self::assertInstanceOf(ImmutableVector::class, $view);
+    }
+
+    public function vectorProvider()
+    {
+        return [
+            [["a", "b", "c"]]
+        ];
+    }
+
+    /**
+     * @dataProvider mutableVectorProvider
+     * @covers ::\Traver\mutable_hash
+     * @param $input
+     */
+    public function testMutableVector($input)
+    {
+        // given
+        $array = $input;
+
+        // when
+        $view = \Traver\mutable_vector($array);
+
+        // then
+        self::assertInstanceOf(MutableVector::class, $view);
+    }
+
+    public function mutableVectorProvider()
+    {
+        return [
+            [["a", "b", "c"]]
         ];
     }
 
@@ -46,7 +122,7 @@ class FunctionsTest extends PHPUnit_Framework_TestCase
         $view = \Traver\in($array);
 
         // then
-        self::assertInstanceOf(Pipeable::class, $view);
+        self::assertInstanceOf(ImmutableMap::class, $view);
     }
 
     public function inProvider()
@@ -55,68 +131,5 @@ class FunctionsTest extends PHPUnit_Framework_TestCase
             [["a", "b", "c"]],
             [new \ArrayObject(["a", "b", "c"])]
         ];
-    }
-
-    /**
-     * @covers ::\Traver\head
-     */
-    public function test_head()
-    {
-        // given
-        $array = ["a", "b", "c"];
-
-        // when
-        $head = \Traver\head($array);
-
-        // then
-        self::assertEquals('a', $head);
-    }
-
-    /**
-     * @covers ::\Traver\tail
-     */
-    public function test_tail()
-    {
-        // given
-        $array = ["a", "b", "c"];
-
-        // when
-        $tail = \Traver\tail($array);
-
-        // then
-        self::assertEquals(array_slice($array, 1, null, true), $tail);
-    }
-
-    /**
-     * @covers ::\Traver\map
-     */
-    public function test_map()
-    {
-        // given
-        $array = ["a", "b", "c"];
-        $mappingFunction = function ($item) {
-            return $item . "_";
-        };
-
-        // when
-        $mapped = \Traver\map($array, $mappingFunction);
-
-        // then
-        self::assertEquals(array_map($mappingFunction, $array), $mapped);
-    }
-
-    /**
-     * @covers ::\Traver\reduce
-     */
-    public function test_reduce()
-    {
-        // given
-        $array = [1, 2, 3];
-
-        // when
-        $reduced = \Traver\reduce($array, \Traver\op("+"));
-
-        // then
-        self::assertEquals(6, $reduced);
     }
 }
