@@ -7,6 +7,7 @@ namespace Traver\Test\UnitTest\Collection;
 use PHPUnit_Framework_Assert;
 use PHPUnit_Framework_TestCase;
 use Traver\Collection\Pipeable;
+use Traver\Collection\PipeableView;
 use Traversable;
 
 abstract class AbstractPipeableTest extends PHPUnit_Framework_TestCase
@@ -733,7 +734,7 @@ abstract class AbstractPipeableTest extends PHPUnit_Framework_TestCase
     }
 
     abstract public function asTraversableProvider();
-    
+
     /**
      * @covers ::getIterator
      */
@@ -751,5 +752,37 @@ abstract class AbstractPipeableTest extends PHPUnit_Framework_TestCase
         // then
         self::assertInstanceOf(\Iterator::class, $iterator);
         self::assertEquals($array, iterator_to_array($iterator));
+    }
+
+    /**
+     * @covers ::view
+     */
+    public function testView()
+    {
+        // given
+        $builder = $this->createBuilder();
+        $enumerable = $builder->build();
+
+        // when
+        $view = $enumerable->view();
+
+        // then
+        self::assertInstanceOf(PipeableView::class, $view);
+    }
+
+    /**
+     * @covers ::force
+     */
+    public function testForce()
+    {
+        // given
+        $builder = $this->createBuilder();
+        $enumerable = $builder->build();
+
+        // when
+        $force = $enumerable->force();
+
+        // then
+        self::assertNotInstanceOf(PipeableView::class, $force);
     }
 }
