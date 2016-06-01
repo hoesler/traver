@@ -17,19 +17,14 @@ abstract class AbstractPipeableTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider mapProvider
      * @covers ::map
-     * @param $array
+     * @param Pipeable $collection
      * @param $mappingFunction
      * @param $expected
      */
-    public function testMap($array, $mappingFunction, $expected)
+    public function testMap($collection, $mappingFunction, $expected)
     {
-        // given
-        $builder = $this->createBuilder();
-        $builder->addAll($array);
-        $enumerable = $builder->build();
-
         // when
-        $mapped = $enumerable->map($mappingFunction);
+        $mapped = $collection->map($mappingFunction);
 
         // then
         self::assertInstanceOf(Pipeable::class, $mapped);

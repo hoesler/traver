@@ -8,6 +8,7 @@ use PhpOption\None;
 use PhpOption\Some;
 use Traver\Callback\Comparators;
 use Traver\Callback\OperatorCallbacks;
+use Traver\Collection\Pipeable;
 
 abstract class AbstractMapTest extends AbstractPipeableTest
 {
@@ -94,14 +95,14 @@ abstract class AbstractMapTest extends AbstractPipeableTest
     public function mapProvider()
     {
         return [
-            'one callback argument' => [["a", "b", "c"], function ($value) {
+            'one callback argument' => [$this->createCollection(["a", "b", "c"]), function ($value) {
                 return $value . "_";
             }, ["a_", "b_", "c_"]],
-            'two callback arguments' => [["a", "b", "c"], function ($value, $key) {
+            'two callback arguments' => [$this->createCollection(["a", "b", "c"]), function ($value, $key) {
                 return $key . $value;
             }, ["0a", "1b", "2c"]],
-            'php function with exactly one argument' => [["a", "b", "c"], 'ucfirst', ["A", "B", "C"]],
-            'empty array' => [[], function ($value) {
+            'php function with exactly one argument' => [$this->createCollection(["a", "b", "c"]), 'ucfirst', ["A", "B", "C"]],
+            'empty array' => [$this->createCollection([]), function ($value) {
                 return $value;
             }, []]
         ];

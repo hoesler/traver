@@ -12,16 +12,11 @@ class RangeTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider toArrayProvider
-     * @param $start
-     * @param $end
-     * @param $exclusive
+     * @param Range $range
      * @param $expected
      */
-    public function testToArray($start, $end, $exclusive, $expected)
+    public function testToArray($range, $expected)
     {
-        // given
-        $range = new Range($start, $end, $exclusive);
-
         // when
         $array = $range->toArray();
 
@@ -32,9 +27,10 @@ class RangeTest extends PHPUnit_Framework_TestCase
     public function toArrayProvider()
     {
         return [
-            [0, 3, true, [0, 1, 2]],
-            [0, 3, false, [0, 1, 2, 3]],
-            ['a', 'd', false, ['a', 'b', 'c', 'd']]
+            [new Range(0, 3, true), [0, 1, 2]],
+            [new Range(0, 3, false), [0, 1, 2, 3]],
+            [new Range('a', 'z', true), range('a', 'y')],
+            [new Range('a', 'z', false), range('a', 'z')]
         ];
     }
 }
