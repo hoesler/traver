@@ -11,6 +11,7 @@ final class Comparators
     }
 
     /**
+     * Compares two values using their natural ordering as defined by the operators, <, > and ==.
      * @return \Closure
      */
     public static function naturalComparator()
