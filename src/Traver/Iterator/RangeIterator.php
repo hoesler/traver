@@ -4,6 +4,8 @@
 namespace Traver\Iterator;
 
 
+use Traver\Callback\Comparators;
+
 class RangeIterator implements \Iterator
 {
     private $start;
@@ -40,19 +42,12 @@ class RangeIterator implements \Iterator
 
     public function valid()
     {
-        if ($this->current() < $this->start) {
-            return false;
+        $relation = call_user_func(Comparators::naturalComparator(), $this->current(), $this->end);
+        if ($this->exclusive) {
+            return $relation < 0;
+        } else {
+            return $relation <= 0;
         }
-
-        if ($this->exclusive && $this->current() >= $this->end) {
-            return false;
-        }
-
-        if (!$this->exclusive && $this->current() > $this->end) {
-            return false;
-        }
-
-        return true;
     }
 
     public function current()
